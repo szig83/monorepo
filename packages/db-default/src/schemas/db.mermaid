@@ -1,0 +1,143 @@
+erDiagram
+    users ||--o{ accounts : "rendelkezik"
+    users ||--o{ sessions : "rendelkezik"
+    users ||--o{ verifications : "rendelkezik"
+    users ||--o{ auditLogs : "rendelkezik"
+    users }|--o{ userGroups : "tartozik"
+    users }|--o{ userRoles : "rendelkezik"
+
+    groups ||--o{ userGroups : "tagjai"
+    groups }|--o{ groupPermissions : "rendelkezik"
+
+    roles ||--o{ userRoles : "hozzárendelve"
+    roles }|--o{ rolePermissions : "rendelkezik"
+
+    permissions ||--o{ rolePermissions : "hozzárendelve"
+    permissions ||--o{ groupPermissions : "hozzárendelve"
+    permissions }o--|| resources : "vonatkozik"
+
+    providers ||--o{ accounts : "hitelesíti"
+
+    users {
+        serial id PK "Elsődleges kulcs"
+        varchar name "Felhasználó teljes neve"
+        varchar email "E-mail cím"
+        boolean emailVerified "E-mail megerősítve"
+        varchar username "Felhasználónév"
+        varchar image "Profilkép URL"
+        timestamp createdAt "Létrehozás ideje"
+        timestamp updatedAt "Frissítés ideje"
+        timestamp deletedAt "Törlés ideje"
+    }
+
+    accounts {
+        serial id PK "Elsődleges kulcs"
+        integer userId FK "Felhasználó azonosító"
+        text providerAccountId "Szolgáltató fiók azonosító"
+        text providerId FK "Szolgáltató azonosító"
+        text accessToken "Hozzáférési token"
+        text refreshToken "Frissítő token"
+        timestamp accessTokenExpiresAt "Hozzáférési token lejárata"
+        timestamp refreshTokenExpiresAt "Frissítő token lejárata"
+        varchar scope "Hozzáférés hatóköre"
+        text idToken "ID token"
+        boolean isActive "Aktív-e"
+        varchar password "Jelszó"
+        integer failedLoginAttempts "Sikertelen belépési kísérletek"
+        timestamp lastLoginAt "Utolsó bejelentkezés"
+        timestamp passwordChangedAt "Jelszó változtatás ideje"
+        timestamp createdAt "Létrehozás ideje"
+        timestamp updatedAt "Frissítés ideje"
+    }
+
+    sessions {
+        serial id PK "Elsődleges kulcs"
+        integer userId FK "Felhasználó azonosító"
+        varchar token "Munkamenet token"
+        timestamp expiresAt "Lejárat ideje"
+        varchar ipAddress "IP cím"
+        varchar userAgent "Felhasználói ügynök"
+        timestamp createdAt "Létrehozás ideje"
+        timestamp updatedAt "Frissítés ideje"
+    }
+
+    verifications {
+        serial id PK "Elsődleges kulcs"
+        varchar identifier "Azonosító"
+        varchar value "Ellenőrző érték"
+        timestamp expiresAt "Lejárat ideje"
+        timestamp createdAt "Létrehozás ideje"
+        timestamp updatedAt "Frissítés ideje"
+    }
+
+    providers {
+        serial id PK "Elsődleges kulcs"
+        varchar name "Szolgáltató neve"
+        boolean enabled "Engedélyezett-e"
+        jsonb config "Konfiguráció"
+        timestamp createdAt "Létrehozás ideje"
+        timestamp updatedAt "Frissítés ideje"
+    }
+
+    groups {
+        serial id PK "Elsődleges kulcs"
+        varchar name "Csoport neve"
+        text description "Leírás"
+        timestamp createdAt "Létrehozás ideje"
+        timestamp updatedAt "Frissítés ideje"
+    }
+
+    userGroups {
+        integer userId FK "Felhasználó azonosító"
+        integer groupId FK "Csoport azonosító"
+        timestamp createdAt "Létrehozás ideje"
+    }
+
+    roles {
+        serial id PK "Elsődleges kulcs"
+        varchar name "Szerepkör neve"
+        text description "Leírás"
+        timestamp createdAt "Létrehozás ideje"
+        timestamp updatedAt "Frissítés ideje"
+    }
+
+    userRoles {
+        integer userId FK "Felhasználó azonosító"
+        integer roleId FK "Szerepkör azonosító"
+        timestamp createdAt "Létrehozás ideje"
+    }
+
+    permissions {
+        serial id PK "Elsődleges kulcs"
+        varchar name "Jogosultság neve"
+        text description "Leírás"
+        integer resourceId FK "Erőforrás azonosító"
+        timestamp createdAt "Létrehozás ideje"
+    }
+
+    resources {
+        serial id PK "Elsődleges kulcs"
+        varchar name "Erőforrás neve"
+        text description "Leírás"
+        timestamp createdAt "Létrehozás ideje"
+    }
+
+    rolePermissions {
+        serial roleId FK "Szerepkör azonosító"
+        integer permissionId FK "Jogosultság azonosító"
+        timestamp createdAt "Létrehozás ideje"
+    }
+
+    groupPermissions {
+        serial groupId FK "Csoport azonosító"
+        integer permissionId FK "Jogosultság azonosító"
+        timestamp createdAt "Létrehozás ideje"
+    }
+
+    auditLogs {
+        serial id PK "Elsődleges kulcs"
+        integer userId FK "Felhasználó azonosító"
+        varchar action "Művelet"
+        text details "Részletek"
+        timestamp createdAt "Létrehozás ideje"
+    }
