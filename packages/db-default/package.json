@@ -12,6 +12,7 @@
         "db:push": "dotenv -e ../../envs/.env.database.local -- cross-env DB_MIGRATING=true drizzle-kit push",
         "db:migrate": "dotenv -e ../../envs/.env.database.local -- cross-env DB_MIGRATING=true bun src/migrate",
         "db:seed": "dotenv -e ../../envs/.env.database.local -- bun src/seed.ts",
+        "db:restore": "dotenv -e ../../envs/.env.database.local -- bun src/restore.ts",
         "lint": "eslint . --max-warnings 0",
         "check-types": "tsc --noEmit",
         "update:dep:latest": "ncu --target latest -ui --format group --install always --packageManager bun",

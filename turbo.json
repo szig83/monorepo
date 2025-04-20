@@ -50,6 +50,9 @@
                 "DB_MIGRATING"
             ]
         },
+        "db:restore": {
+            "cache": false
+        },
         "update:dep:latest": {}
     }
 }

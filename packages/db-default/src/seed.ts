@@ -1,20 +1,16 @@
-import * as dotenv from 'dotenv'
 import * as path from 'path'
 import * as fs from 'fs'
 import chalk from 'chalk'
-
-// Load environment variables from the root .env file
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') })
-
 import { sql } from 'drizzle-orm'
 import { getTableConfig } from 'drizzle-orm/pg-core'
 
-import db from '@/index'
-import * as schema from '@/schemas'
-import * as seeds from '@/seeds'
+import db from './index'
+import * as schema from './schemas'
+import * as seeds from './seeds'
 import { env } from './env'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
 import config from '@/../drizzle.config'
+import { deleteSchemas, findSchemas } from './utils'
 
 type SeedOptions = {
 	tableReset: boolean
@@ -127,32 +123,37 @@ async function resetTables() {
  * Kiindulási tábla adatok betöltése.
  */
 async function seedTableData() {
-	// Seed adatok betöltése a függőségi sorrend figyelembevételével
-
 	console.log(chalk.blue.bold('[Tábla adatok betöltése - START]'))
 
-	// 1. Alap entitások (nincs külső kulcs függőségük)
-	console.log(
-		chalk.gray('  ↳ Alapentitások betöltése (Erőforrások, Szolgáltatók, Csoportok, Szerepkörök)...'),
-	)
+	console.group(chalk.cyan('1. Alapentitások'))
+	console.log(chalk.gray('Erőforrások, Szolgáltatók, Csoportok, Szerepkörök betöltése...'))
 	await seeds.resources(db) // Erőforrások
 	await seeds.providers(db) // Hitelesítési szolgáltatók
 	await seeds.groups(db) // Csoportok
 	await seeds.roles(db) // Szerepkörök
+	console.log(chalk.green('✔ Kész'))
+	console.groupEnd()
 
-	// 2. Jogosultságok (függenek az erőforrásoktól)
-	console.log(chalk.gray('  ↳ Jogosultságok betöltése...'))
+	console.group(chalk.cyan('2. Jogosultságok'))
+	console.log(chalk.gray('Jogosultságok betöltése...'))
 	await seeds.permissions(db) // Jogosultságok
+	console.log(chalk.green('✔ Kész'))
+	console.groupEnd()
 
-	// 3. Kapcsolatok az entitások között
-	console.log(chalk.gray('  ↳ Entitás kapcsolatok betöltése...'))
+	console.group(chalk.cyan('3. Kapcsolatok'))
+	console.log(chalk.gray('Szerepkör-jogosultság és Csoport-jogosultság kapcsolatok betöltése...'))
 	await seeds.rolePermissions(db) // Szerepkör-jogosultság kapcsolatok
 	await seeds.groupPermissions(db) // Csoport-jogosultság kapcsolatok
+	console.log(chalk.green('✔ Kész'))
+	console.groupEnd()
 
-	// 4. Felhasználók és kapcsolataik
-	console.log(chalk.gray('  ↳ Felhasználók és kapcsolataik betöltése...'))
+	console.group(chalk.cyan('4. Felhasználók és kapcsolataik'))
+	console.log(chalk.gray('Felhasználók és Felhasználó-szerepkör kapcsolatok betöltése...'))
 	await seeds.users(db, seedOptions.publicUserCount) // Felhasználók
 	await seeds.userRoles(db) // Felhasználó-szerepkör kapcsolatok
+	console.log(chalk.green('✔ Kész'))
+	console.groupEnd()
+
 	console.log(chalk.green.bold('[Tábla adatok betöltése - VÉGE | 🟢 Sikeresen betöltve]') + '\n')
 }
 
@@ -198,57 +199,28 @@ async function seedStoredProcedures() {
 			`   ${chalk.green('✔')} ${chalk.cyan(path.relative(proceduresDir, filePath))} ${hasDtsFile ? chalk.green(' (d.ts OK)') : chalk.red.bold(' (d.ts HIÁNYZIK: ' + path.relative(proceduresDir, dtsPath) + ')')}`,
 		)
 	}
-	console.log(chalk.green.bold('[Tárolt eljárások betöltése - VÉGE | 🟢 Sikeresen betöltve]') + '\n')
+	console.log(
+		chalk.green.bold('[Tárolt eljárások betöltése - VÉGE | 🟢 Sikeresen betöltve]') + '\n',
+	)
 }
 
 /**
  * Create specified schemas if they don't exist.
  */
 async function createSchemas() {
-	const schemasDir = path.resolve(__dirname, 'schemas')
-	let schemasToCreate: string[] = []
+	const schemas = findSchemas()
 
-	try {
-		console.log(chalk.blue.bold(`[Sémák keresése: ${chalk.magenta(schemasDir)}]`))
-		const dirents = fs.readdirSync(schemasDir, { withFileTypes: true })
-		schemasToCreate = dirents.filter((dirent) => dirent.isDirectory()).map((dirent) => dirent.name)
-
-		if (schemasToCreate.length > 0) {
-			console.log(`   ${chalk.gray('Talált sémák:')} ${chalk.cyan(schemasToCreate.join(', '))}`)
-		} else {
-			console.log(
-				`   ${chalk.gray('Nem található alkönyvtár (séma) a(z) ')} ${chalk.magenta(schemasDir)}`,
-			)
-		}
-	} catch (error: unknown) {
-		// Type guard to safely access error.code
-		if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'ENOENT') {
-			console.warn(
-				`   ${chalk.yellow('⚠️')} A(z) '${chalk.magenta(schemasDir)}' séma könyvtár nem található. Sémák létrehozása kihagyva.`,
-			)
-		} else {
-			console.error(
-				`   ${chalk.red('❌')} Hiba a(z) '${chalk.magenta(schemasDir)}' könyvtár olvasása közben:`,
-				error,
-			)
-		}
-		// If directory read fails, proceed without creating schemas
-		console.log(chalk.yellow.bold('[Sémák létrehozása - VÉGE | 🟡 Kihagyva (hiba/üres)]') + '\n')
-		return // Exit the function early
-	}
-
-	// If no schemas found, exit early
-	if (schemasToCreate.length === 0) {
-		console.log(chalk.green.bold('[Sémák létrehozása - VÉGE | ✅ Nincs tennivaló]') + '\n')
-		return
-	}
+	// --- Sémák törlése ---
+	await deleteSchemas(schemas)
 
 	console.log(chalk.blue.bold('[Sémák létrehozása - START]'))
-	for (const schemaName of schemasToCreate) {
+	for (const schemaName of schemas) {
 		try {
 			// Use 'CREATE SCHEMA IF NOT EXISTS' to avoid errors if the schema already exists.
 			await db.execute(sql.raw(`CREATE SCHEMA IF NOT EXISTS ${schemaName};`))
-			console.log(`   ${chalk.green('✔')} Séma '${chalk.cyan(schemaName)}' létrehozva vagy már létezik.`)
+			console.log(
+				`   ${chalk.green('✔')} Séma '${chalk.cyan(schemaName)}' létrehozva vagy már létezik.`,
+			)
 		} catch (error) {
 			console.error(
 				`   ${chalk.red('❌')} Hiba a(z) '${chalk.cyan(schemaName)}' séma létrehozása közben:`,
@@ -265,13 +237,14 @@ async function createSchemas() {
  * Seed adatok betöltése.
  */
 async function main() {
-	console.log(chalk.inverse('🌱 Adatbázis seedelés indítása... 🌱'))
+	console.log('\n' + chalk.bold.underline('🚀 ADATBÁZIS SEEDELÉS INDÍTÁSA') + '\n')
 
 	// Sémák létrehozása
 	await createSchemas()
 
 	// Migrációk futtatása
 	console.log(chalk.blue.bold('[Migrációk futtatása - START]'))
+	console.log(chalk.gray(`Migrációs könyvtár: ${config.out}`))
 	await migrate(db, { migrationsFolder: config.out! })
 	console.log(chalk.green.bold('[Migrációk futtatása - VÉGE | 🟢 Sikeresen futtatva]') + '\n')
 
@@ -292,7 +265,7 @@ async function main() {
 	// Kiindulási tábla adatok betöltése
 	await seedTableData()
 
-	console.log(chalk.inverse('✅ Adatbázis seedelés befejezve! ✅'))
+	console.log(chalk.bold.underline('✨ ADATBÁZIS SEEDELÉS BEFEJEZVE!') + '\n')
 }
 
 main()
