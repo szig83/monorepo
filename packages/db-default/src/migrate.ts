@@ -1,7 +1,7 @@
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
 
 import config from '@/../drizzle.config'
-import { env } from '@/lib/env'
+import { env } from './env'
 
 import db, { client } from './index'
 

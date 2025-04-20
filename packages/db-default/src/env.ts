@@ -13,6 +13,7 @@ const envSchema = z.object({
 		.refine((s) => s === 'true' || s === 'false')
 		.transform((s) => s === 'true')
 		.optional(),
+	SEED_USER_COUNT: z.coerce.number().optional().default(0),
 })
 
 // Típus generálása a schemából
@@ -27,6 +28,7 @@ function validateEnv(): Env {
 			DB_NAME: process.env.DB_NAME,
 			DB_PORT: process.env.DB_PORT,
 			DB_MIGRATING: process.env.DB_MIGRATING,
+			SEED_USER_COUNT: process.env.SEED_USER_COUNT,
 		})
 	} catch (error) {
 		if (error instanceof ZodError) {
