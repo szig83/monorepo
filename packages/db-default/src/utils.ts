@@ -9,6 +9,9 @@ import * as fs from 'fs'
  */
 export async function deleteSchemas(schemasToDelete: string[]): Promise<void> {
 	schemasToDelete.push('drizzle')
+	if (!schemasToDelete.includes('public')) {
+		schemasToDelete.push('public')
+	}
 
 	console.log(chalk.blue.bold('\n[Meglévő sémák törlése - START]'))
 	for (const schemaName of schemasToDelete) {
