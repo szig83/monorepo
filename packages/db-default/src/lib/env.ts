@@ -8,12 +8,13 @@ const envSchema = z.object({
 	DB_PASSWORD: z.string(),
 	DB_NAME: z.string(),
 	DB_PORT: z.coerce.number(),
+	SCHEMA_DIR: z.string().optional().default('schemas'),
 	DB_MIGRATING: z
 		.string()
 		.refine((s) => s === 'true' || s === 'false')
 		.transform((s) => s === 'true')
 		.optional(),
-	SEED_USER_COUNT: z.coerce.number().optional().default(0),
+	SEED_PUBLIC_USER_COUNT: z.coerce.number().optional().default(0),
 })
 
 // Típus generálása a schemából
@@ -27,8 +28,9 @@ function validateEnv(): Env {
 			DB_PASSWORD: process.env.DB_PASSWORD,
 			DB_NAME: process.env.DB_NAME,
 			DB_PORT: process.env.DB_PORT,
+			SCHEMA_DIR: process.env.SCHEMA_DIR,
 			DB_MIGRATING: process.env.DB_MIGRATING,
-			SEED_USER_COUNT: process.env.SEED_USER_COUNT,
+			SEED_PUBLIC_USER_COUNT: process.env.SEED_PUBLIC_USER_COUNT,
 		})
 	} catch (error) {
 		if (error instanceof ZodError) {

@@ -1,81 +1,73 @@
-import * as path from 'path'
-import * as fs from 'fs'
 import chalk from 'chalk'
-import { sql } from 'drizzle-orm'
+import { client } from './index'
+import {
+	deleteSchemas,
+	findSchemas,
+	getLatestBackupFile,
+	createSnapshot,
+	restore,
+} from '@/lib/utils'
+import * as cm from '@/lib/consoleMessage'
 
-import db, { client } from './index'
-import { deleteSchemas, findSchemas } from './utils'
+async function start() {
+	let isSuccess = false
+	const stopOnError = false // Leállítsa-e a teljes folyamat futását hiba esetén (process.exit(1))
 
-async function restore() {
-	console.log('\n' + chalk.bold.underline('🚀 ADATBÁZIS VISSZAÁLLÍTÁSA INDÍTÁSA') + '\n')
+	cm.startScript('Adatbázis inicializálás indítása')
 
-	// --- Backup fájl keresése ---
-	console.log(chalk.blue.bold('[Legújabb backup fájl keresése - START]'))
-	const backupDir = path.join(__dirname, 'backups')
+	// Backup fájl keresése
+	const backupFile = await getLatestBackupFile(stopOnError)
 
-	let files: string[] = []
-	try {
-		files = fs.readdirSync(backupDir)
-	} catch (error) {
-		console.error(chalk.red(`❌ Hiba a backup könyvtár olvasása közben: ${backupDir}`), error)
-		process.exit(1)
+	if (backupFile) {
+		// Sémák keresése (orm séma szerkezetből)
+		const schemas = findSchemas(stopOnError)
+
+		if (schemas.length > 0) {
+			// Biztonsági mentés készítése a meglévő adatbázisról
+			const databaseSnapshot = await createSnapshot(stopOnError)
+
+			if (databaseSnapshot) {
+				// Sémák törlése az adatbázisból
+				const deleteSchemaResult = await deleteSchemas(schemas)
+
+				let needToRestoreSnapshot = false
+
+				if (deleteSchemaResult.isSuccess) {
+					// Adatbázis betöltése a backup fájlból
+					const loadDatabase: boolean = await restore(backupFile, stopOnError)
+
+					if (loadDatabase) {
+						isSuccess = true
+					} else {
+						needToRestoreSnapshot = true
+					}
+				} else if (deleteSchemaResult.deletedSchemas.length > 0) {
+					needToRestoreSnapshot = true
+				}
+
+				// Ha a betöltés sikertelen volt (vagy részlegesen törlődtek sémák), akkor visszaállítjuk a snapshotot
+				if (needToRestoreSnapshot) {
+					await restore(databaseSnapshot, stopOnError, true)
+				}
+
+				const processText = 'Adatbázis kapcsolat bontása'
+				cm.startProcess(processText)
+				await client.end()
+				cm.endProcess(processText)
+			}
+		}
 	}
 
-	const sqlFiles = files
-		.filter((file) => path.extname(file) === '.sql')
-		.map((file) => ({
-			name: file,
-			time: fs.statSync(path.join(backupDir, file)).mtime.getTime(),
-		}))
-		.sort((a, b) => b.time - a.time)
-
-	const latestBackup = sqlFiles[0]
-
-	if (!latestBackup) {
-		console.error(chalk.red(`❌ Nem található SQL backup fájl itt: ${backupDir}`))
+	if (isSuccess) {
+		console.log(chalk.underline('\n✨ADATBÁZIS VISSZAÁLLÍTÁSA SIKERESEN BEFEJEZVE!') + '\n')
+		process.exit(0)
+	} else {
+		console.error(chalk.underline('\n🔥ADATBÁZIS VISSZAÁLLÍTÁSA SIKERTELEN') + '\n')
 		process.exit(1)
 	}
-
-	const latestBackupFile = latestBackup.name
-	const filePath = path.join(backupDir, latestBackupFile)
-	console.log(`   ${chalk.green('✔')} Legújabb backup: ${chalk.cyan(latestBackupFile)}`)
-	console.log(chalk.green.bold('[Legújabb backup fájl keresése - VÉGE]') + '\n')
-
-	// --- Sémák olvasása ---
-	const schemas = findSchemas()
-
-	// --- Sémák törlése ---
-	await deleteSchemas(schemas)
-
-	// --- Visszaállítás backupból ---
-	console.log(
-		chalk.blue.bold(`[Adatbázis visszaállítása (${chalk.cyan(latestBackupFile)}) - START]`),
-	)
-	try {
-		console.log(chalk.dim('   Backup fájl tartalmának olvasása...'))
-		const backupSQL = fs.readFileSync(filePath, 'utf8')
-		console.log(chalk.dim('   SQL parancsok végrehajtása...'))
-		await db.execute(sql.raw(backupSQL))
-		console.log(`   ${chalk.green('✔')} Adatbázis sikeresen visszaállítva.`)
-	} catch (error) {
-		console.error(chalk.red('❌ Hiba az adatbázis visszaállítása közben:'), error)
-		process.exit(1)
-	}
-	console.log(chalk.green.bold('[Adatbázis visszaállítása - VÉGE]') + '\n')
-
-	// --- Kapcsolat bontása ---
-	console.log(chalk.blue.bold('[Adatbázis kapcsolat bontása - START]'))
-	await client.end()
-	console.log(`   ${chalk.green('✔')} Adatbázis kapcsolat bontva.`)
-	console.log(chalk.green.bold('[Adatbázis kapcsolat bontása - VÉGE]') + '\n')
-
-	console.log(chalk.bold.underline('\n✨ ADATBÁZIS VISSZAÁLLÍTÁSA BEFEJEZVE!') + '\n')
 }
 
-restore().catch((error) => {
-	console.error(
-		chalk.red.bold('\n🔥 Váratlan hiba történt a visszaállítási folyamat során:'),
-		error,
-	)
+start().catch((error) => {
+	console.error(chalk.red('\n🔥 Váratlan hiba történt a visszaállítási folyamat során:'), error)
 	process.exit(1)
 })

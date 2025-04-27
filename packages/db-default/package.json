@@ -19,11 +19,12 @@
         "update:dep:newest": "ncu --target newest -ui --format group --install always --packageManager bun"
     },
     "dependencies": {
+        "@zod/mini": "^4.0.0-beta.20250412T085909",
+        "cross-env": "^7.0.3",
+        "date-fns": "^4.1.0",
         "drizzle-orm": "^0.42.0",
         "drizzle-zod": "^0.7.1",
         "pg": "^8.14.1",
-        "cross-env": "^7.0.3",
-        "@zod/mini": "^4.0.0-beta.20250412T085909",
         "zod": "^4.0.0-beta.20250412T085909"
     },
     "devDependencies": {

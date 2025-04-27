@@ -24,7 +24,7 @@ SET row_security = off;
 -- Name: auth; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA auth;
+CREAT SCHEMA auth;
 
 
 --

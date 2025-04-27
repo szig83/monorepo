@@ -21,7 +21,7 @@ type SeedOptions = {
 const seedOptions: SeedOptions = {
 	tableReset: true,
 	storedProcedures: true,
-	publicUserCount: env.SEED_USER_COUNT,
+	publicUserCount: env.SEED_PUBLIC_USER_COUNT,
 }
 
 function getSchemaTableNames(): string[] {
@@ -37,9 +37,7 @@ function getSchemaTableNames(): string[] {
 
 	// Lekérdezi a táblák neveit (opcionális)
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const allTableNames = allTables.map((table) => getTableConfig(table as any).name)
-
-	return allTableNames
+	return allTables.map((table) => getTableConfig(table as any).name)
 }
 
 /**
@@ -85,7 +83,9 @@ async function resetTables() {
 				schemaTables.splice(index, 1)
 			}
 
-			console.log(`   ${chalk.green('✔')} ${chalk.cyan(tableConfig.name)} sikeresen kiürítve`)
+			console.log(
+				`   ${chalk.green('✔')} ${chalk.cyan(tableConfig.name)} sikeresen kiürítve`,
+			)
 		} catch (error: unknown) {
 			// Check if the error is a PostgreSQL 'table does not exist' error (code 42P01)
 			if (
