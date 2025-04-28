@@ -63,6 +63,7 @@ export function subProcess(
 	type: 'info' | 'success' | 'error' | 'warning' | null = null,
 	extraInfo: string = '',
 	indent: number = 1,
+	startWithNewLine: boolean = false,
 ): void {
 	let icon = ''
 	const indentation = getIndentation(indent)
@@ -75,5 +76,7 @@ export function subProcess(
 	} else if (type === 'warning') {
 		icon = chalk.yellow('⚠️ ')
 	}
-	console.log(`${indentation}${icon}${text} ${chalk.cyan(extraInfo)}`)
+	console.log(
+		`${startWithNewLine ? '\n' : ''}${indentation}${icon}${text} ${chalk.cyan(extraInfo)}`,
+	)
 }

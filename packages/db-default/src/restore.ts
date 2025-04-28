@@ -6,6 +6,8 @@ import {
 	getLatestBackupFile,
 	createSnapshot,
 	restore,
+	dropDatabase,
+	createDatabase,
 } from '@/lib/utils'
 import * as cm from '@/lib/consoleMessage'
 
@@ -14,6 +16,7 @@ async function start() {
 	const stopOnError = false // Leállítsa-e a teljes folyamat futását hiba esetén (process.exit(1))
 
 	cm.startScript('Adatbázis inicializálás indítása')
+	cm.subProcess('Adatbázis kapcsolat létrehozva', 'success', '', 0, true)
 
 	// Backup fájl keresése
 	const backupFile = await getLatestBackupFile(stopOnError)
@@ -49,20 +52,18 @@ async function start() {
 				if (needToRestoreSnapshot) {
 					await restore(databaseSnapshot, stopOnError, true)
 				}
-
-				const processText = 'Adatbázis kapcsolat bontása'
-				cm.startProcess(processText)
-				await client.end()
-				cm.endProcess(processText)
 			}
 		}
 	}
 
+	await client.end()
+	cm.subProcess('Adatbázis kapcsolat bontva', 'success', '', 0, true)
+
 	if (isSuccess) {
-		console.log(chalk.underline('\n✨ADATBÁZIS VISSZAÁLLÍTÁSA SIKERESEN BEFEJEZVE!') + '\n')
+		console.log(chalk.underline('\n✨ ADATBÁZIS VISSZAÁLLÍTÁSA SIKERESEN BEFEJEZVE!') + '\n')
 		process.exit(0)
 	} else {
-		console.error(chalk.underline('\n🔥ADATBÁZIS VISSZAÁLLÍTÁSA SIKERTELEN') + '\n')
+		console.error(chalk.underline('\n🔥 ADATBÁZIS VISSZAÁLLÍTÁSA SIKERTELEN') + '\n')
 		process.exit(1)
 	}
 }

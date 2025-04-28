@@ -267,3 +267,43 @@ export async function restore(
 	}
 	return isSuccess
 }
+
+export async function dropDatabase(stopOnError = true): Promise<boolean> {
+	const processText = 'Adatbázis törlése'
+	let isSuccess = false
+	cm.startProcess(processText)
+	try {
+		await db.execute(sql.raw(`DROP DATABASE IF EXISTS ${config.DB_NAME};`))
+		cm.subProcess('Adatbázis törlése', 'success')
+		isSuccess = true
+	} catch (error) {
+		cm.subProcess('Hiba az adatbázis törlésekor', 'error')
+		const errorMessage = error instanceof Error ? error.message : String(error)
+		cm.consoleMessage(errorMessage, 'error', 1)
+		if (stopOnError) {
+			cm.endProcess(processText, 'error')
+			process.exit(1)
+		}
+	}
+	return isSuccess
+}
+
+export async function createDatabase(stopOnError = true): Promise<boolean> {
+	const processText = 'Adatbázis létrehozása'
+	let isSuccess = false
+	cm.startProcess(processText)
+	try {
+		await db.execute(sql.raw(`CREATE DATABASE IF NOT EXISTS ${config.DB_NAME};`))
+		cm.subProcess('Adatbázis létrehozva:', 'success', config.DB_NAME)
+		isSuccess = true
+	} catch (error) {
+		cm.subProcess('Hiba az adatbázis létrehozásakor', 'error')
+		const errorMessage = error instanceof Error ? error.message : String(error)
+		cm.consoleMessage(errorMessage, 'error', 1)
+		if (stopOnError) {
+			cm.endProcess(processText, 'error')
+			process.exit(1)
+		}
+	}
+	return isSuccess
+}

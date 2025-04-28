@@ -3,9 +3,7 @@
 --
 
 -- Dumped from database version 17.4 (Debian 17.4-1.pgdg120+2)
--- Dumped by pg_dump version 17.4
-
--- Started on 2025-04-22 21:57:42 CEST
+-- Dumped by pg_dump version 17.4 (Debian 17.4-1.pgdg120+2)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -20,7 +18,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 5 (class 2615 OID 16385)
 -- Name: auth; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -28,15 +25,20 @@ CREATE SCHEMA auth;
 
 
 --
--- TOC entry 6 (class 2615 OID 16386)
 -- Name: public; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA public;
+-- *not* creating schema, since initdb creates it
 
 
 --
--- TOC entry 244 (class 1255 OID 16387)
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON SCHEMA public IS '';
+
+
+--
 -- Name: get_groups(integer); Type: FUNCTION; Schema: auth; Owner: -
 --
 
@@ -57,7 +59,6 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 218 (class 1259 OID 16388)
 -- Name: accounts; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -83,7 +84,6 @@ CREATE TABLE auth.accounts (
 
 
 --
--- TOC entry 219 (class 1259 OID 16397)
 -- Name: accounts_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
@@ -97,8 +97,6 @@ CREATE SEQUENCE auth.accounts_id_seq
 
 
 --
--- TOC entry 3542 (class 0 OID 0)
--- Dependencies: 219
 -- Name: accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
@@ -106,7 +104,6 @@ ALTER SEQUENCE auth.accounts_id_seq OWNED BY auth.accounts.id;
 
 
 --
--- TOC entry 220 (class 1259 OID 16398)
 -- Name: audit_logs; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -125,7 +122,6 @@ CREATE TABLE auth.audit_logs (
 
 
 --
--- TOC entry 221 (class 1259 OID 16404)
 -- Name: audit_logs_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
@@ -139,8 +135,6 @@ CREATE SEQUENCE auth.audit_logs_id_seq
 
 
 --
--- TOC entry 3543 (class 0 OID 0)
--- Dependencies: 221
 -- Name: audit_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
@@ -148,7 +142,6 @@ ALTER SEQUENCE auth.audit_logs_id_seq OWNED BY auth.audit_logs.id;
 
 
 --
--- TOC entry 222 (class 1259 OID 16405)
 -- Name: group_permissions; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -160,7 +153,6 @@ CREATE TABLE auth.group_permissions (
 
 
 --
--- TOC entry 223 (class 1259 OID 16409)
 -- Name: group_permissions_group_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
@@ -174,8 +166,6 @@ CREATE SEQUENCE auth.group_permissions_group_id_seq
 
 
 --
--- TOC entry 3544 (class 0 OID 0)
--- Dependencies: 223
 -- Name: group_permissions_group_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
@@ -183,7 +173,6 @@ ALTER SEQUENCE auth.group_permissions_group_id_seq OWNED BY auth.group_permissio
 
 
 --
--- TOC entry 224 (class 1259 OID 16410)
 -- Name: groups; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -197,7 +186,6 @@ CREATE TABLE auth.groups (
 
 
 --
--- TOC entry 225 (class 1259 OID 16417)
 -- Name: groups_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
@@ -211,8 +199,6 @@ CREATE SEQUENCE auth.groups_id_seq
 
 
 --
--- TOC entry 3545 (class 0 OID 0)
--- Dependencies: 225
 -- Name: groups_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
@@ -220,7 +206,6 @@ ALTER SEQUENCE auth.groups_id_seq OWNED BY auth.groups.id;
 
 
 --
--- TOC entry 226 (class 1259 OID 16418)
 -- Name: permissions; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -234,7 +219,6 @@ CREATE TABLE auth.permissions (
 
 
 --
--- TOC entry 227 (class 1259 OID 16424)
 -- Name: permissions_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
@@ -248,8 +232,6 @@ CREATE SEQUENCE auth.permissions_id_seq
 
 
 --
--- TOC entry 3546 (class 0 OID 0)
--- Dependencies: 227
 -- Name: permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
@@ -257,7 +239,6 @@ ALTER SEQUENCE auth.permissions_id_seq OWNED BY auth.permissions.id;
 
 
 --
--- TOC entry 228 (class 1259 OID 16425)
 -- Name: providers; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -272,7 +253,6 @@ CREATE TABLE auth.providers (
 
 
 --
--- TOC entry 229 (class 1259 OID 16433)
 -- Name: providers_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
@@ -286,8 +266,6 @@ CREATE SEQUENCE auth.providers_id_seq
 
 
 --
--- TOC entry 3547 (class 0 OID 0)
--- Dependencies: 229
 -- Name: providers_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
@@ -295,7 +273,6 @@ ALTER SEQUENCE auth.providers_id_seq OWNED BY auth.providers.id;
 
 
 --
--- TOC entry 230 (class 1259 OID 16434)
 -- Name: resources; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -308,7 +285,6 @@ CREATE TABLE auth.resources (
 
 
 --
--- TOC entry 231 (class 1259 OID 16440)
 -- Name: resources_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
@@ -322,8 +298,6 @@ CREATE SEQUENCE auth.resources_id_seq
 
 
 --
--- TOC entry 3548 (class 0 OID 0)
--- Dependencies: 231
 -- Name: resources_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
@@ -331,7 +305,6 @@ ALTER SEQUENCE auth.resources_id_seq OWNED BY auth.resources.id;
 
 
 --
--- TOC entry 232 (class 1259 OID 16441)
 -- Name: role_permissions; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -343,7 +316,6 @@ CREATE TABLE auth.role_permissions (
 
 
 --
--- TOC entry 233 (class 1259 OID 16445)
 -- Name: role_permissions_role_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
@@ -357,8 +329,6 @@ CREATE SEQUENCE auth.role_permissions_role_id_seq
 
 
 --
--- TOC entry 3549 (class 0 OID 0)
--- Dependencies: 233
 -- Name: role_permissions_role_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
@@ -366,7 +336,6 @@ ALTER SEQUENCE auth.role_permissions_role_id_seq OWNED BY auth.role_permissions.
 
 
 --
--- TOC entry 234 (class 1259 OID 16446)
 -- Name: roles; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -380,7 +349,6 @@ CREATE TABLE auth.roles (
 
 
 --
--- TOC entry 235 (class 1259 OID 16453)
 -- Name: roles_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
@@ -394,8 +362,6 @@ CREATE SEQUENCE auth.roles_id_seq
 
 
 --
--- TOC entry 3550 (class 0 OID 0)
--- Dependencies: 235
 -- Name: roles_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
@@ -403,7 +369,6 @@ ALTER SEQUENCE auth.roles_id_seq OWNED BY auth.roles.id;
 
 
 --
--- TOC entry 236 (class 1259 OID 16454)
 -- Name: sessions; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -420,7 +385,6 @@ CREATE TABLE auth.sessions (
 
 
 --
--- TOC entry 237 (class 1259 OID 16461)
 -- Name: sessions_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
@@ -434,8 +398,6 @@ CREATE SEQUENCE auth.sessions_id_seq
 
 
 --
--- TOC entry 3551 (class 0 OID 0)
--- Dependencies: 237
 -- Name: sessions_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
@@ -443,7 +405,6 @@ ALTER SEQUENCE auth.sessions_id_seq OWNED BY auth.sessions.id;
 
 
 --
--- TOC entry 238 (class 1259 OID 16462)
 -- Name: user_groups; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -455,7 +416,6 @@ CREATE TABLE auth.user_groups (
 
 
 --
--- TOC entry 239 (class 1259 OID 16466)
 -- Name: user_roles; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -467,7 +427,6 @@ CREATE TABLE auth.user_roles (
 
 
 --
--- TOC entry 240 (class 1259 OID 16470)
 -- Name: users; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -485,7 +444,6 @@ CREATE TABLE auth.users (
 
 
 --
--- TOC entry 241 (class 1259 OID 16478)
 -- Name: users_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
@@ -499,8 +457,6 @@ CREATE SEQUENCE auth.users_id_seq
 
 
 --
--- TOC entry 3552 (class 0 OID 0)
--- Dependencies: 241
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
@@ -508,7 +464,6 @@ ALTER SEQUENCE auth.users_id_seq OWNED BY auth.users.id;
 
 
 --
--- TOC entry 242 (class 1259 OID 16479)
 -- Name: verifications; Type: TABLE; Schema: auth; Owner: -
 --
 
@@ -523,7 +478,6 @@ CREATE TABLE auth.verifications (
 
 
 --
--- TOC entry 243 (class 1259 OID 16486)
 -- Name: verifications_id_seq; Type: SEQUENCE; Schema: auth; Owner: -
 --
 
@@ -537,8 +491,6 @@ CREATE SEQUENCE auth.verifications_id_seq
 
 
 --
--- TOC entry 3553 (class 0 OID 0)
--- Dependencies: 243
 -- Name: verifications_id_seq; Type: SEQUENCE OWNED BY; Schema: auth; Owner: -
 --
 
@@ -546,7 +498,6 @@ ALTER SEQUENCE auth.verifications_id_seq OWNED BY auth.verifications.id;
 
 
 --
--- TOC entry 3275 (class 2604 OID 16487)
 -- Name: accounts id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
@@ -554,7 +505,6 @@ ALTER TABLE ONLY auth.accounts ALTER COLUMN id SET DEFAULT nextval('auth.account
 
 
 --
--- TOC entry 3280 (class 2604 OID 16488)
 -- Name: audit_logs id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
@@ -562,7 +512,6 @@ ALTER TABLE ONLY auth.audit_logs ALTER COLUMN id SET DEFAULT nextval('auth.audit
 
 
 --
--- TOC entry 3282 (class 2604 OID 16489)
 -- Name: group_permissions group_id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
@@ -570,7 +519,6 @@ ALTER TABLE ONLY auth.group_permissions ALTER COLUMN group_id SET DEFAULT nextva
 
 
 --
--- TOC entry 3284 (class 2604 OID 16490)
 -- Name: groups id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
@@ -578,7 +526,6 @@ ALTER TABLE ONLY auth.groups ALTER COLUMN id SET DEFAULT nextval('auth.groups_id
 
 
 --
--- TOC entry 3287 (class 2604 OID 16491)
 -- Name: permissions id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
@@ -586,7 +533,6 @@ ALTER TABLE ONLY auth.permissions ALTER COLUMN id SET DEFAULT nextval('auth.perm
 
 
 --
--- TOC entry 3289 (class 2604 OID 16492)
 -- Name: providers id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
@@ -594,7 +540,6 @@ ALTER TABLE ONLY auth.providers ALTER COLUMN id SET DEFAULT nextval('auth.provid
 
 
 --
--- TOC entry 3293 (class 2604 OID 16493)
 -- Name: resources id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
@@ -602,7 +547,6 @@ ALTER TABLE ONLY auth.resources ALTER COLUMN id SET DEFAULT nextval('auth.resour
 
 
 --
--- TOC entry 3295 (class 2604 OID 16494)
 -- Name: role_permissions role_id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
@@ -610,7 +554,6 @@ ALTER TABLE ONLY auth.role_permissions ALTER COLUMN role_id SET DEFAULT nextval(
 
 
 --
--- TOC entry 3297 (class 2604 OID 16495)
 -- Name: roles id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
@@ -618,7 +561,6 @@ ALTER TABLE ONLY auth.roles ALTER COLUMN id SET DEFAULT nextval('auth.roles_id_s
 
 
 --
--- TOC entry 3300 (class 2604 OID 16496)
 -- Name: sessions id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
@@ -626,7 +568,6 @@ ALTER TABLE ONLY auth.sessions ALTER COLUMN id SET DEFAULT nextval('auth.session
 
 
 --
--- TOC entry 3305 (class 2604 OID 16497)
 -- Name: users id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
@@ -634,7 +575,6 @@ ALTER TABLE ONLY auth.users ALTER COLUMN id SET DEFAULT nextval('auth.users_id_s
 
 
 --
--- TOC entry 3309 (class 2604 OID 16498)
 -- Name: verifications id; Type: DEFAULT; Schema: auth; Owner: -
 --
 
@@ -642,8 +582,6 @@ ALTER TABLE ONLY auth.verifications ALTER COLUMN id SET DEFAULT nextval('auth.ve
 
 
 --
--- TOC entry 3511 (class 0 OID 16388)
--- Dependencies: 218
 -- Data for Name: accounts; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
@@ -653,16 +591,12 @@ INSERT INTO auth.accounts VALUES (3, 3, '3', 'credential', NULL, NULL, NULL, NUL
 
 
 --
--- TOC entry 3513 (class 0 OID 16398)
--- Dependencies: 220
 -- Data for Name: audit_logs; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 
 
 --
--- TOC entry 3515 (class 0 OID 16405)
--- Dependencies: 222
 -- Data for Name: group_permissions; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
@@ -706,8 +640,6 @@ INSERT INTO auth.group_permissions VALUES (4, 15, '2025-04-20 22:38:50.196957+00
 
 
 --
--- TOC entry 3517 (class 0 OID 16410)
--- Dependencies: 224
 -- Data for Name: groups; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
@@ -718,8 +650,6 @@ INSERT INTO auth.groups VALUES (4, '{"en": "General User", "hu": "Általános fe
 
 
 --
--- TOC entry 3519 (class 0 OID 16418)
--- Dependencies: 226
 -- Data for Name: permissions; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
@@ -747,8 +677,6 @@ INSERT INTO auth.permissions VALUES (21, 'settings:update', 'Beállítások mód
 
 
 --
--- TOC entry 3521 (class 0 OID 16425)
--- Dependencies: 228
 -- Data for Name: providers; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
@@ -759,8 +687,6 @@ INSERT INTO auth.providers VALUES (4, 'github', false, '{"clientId": "", "callba
 
 
 --
--- TOC entry 3523 (class 0 OID 16434)
--- Dependencies: 230
 -- Data for Name: resources; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
@@ -773,8 +699,6 @@ INSERT INTO auth.resources VALUES (6, 'settings', 'Rendszerbeállítások kezel�
 
 
 --
--- TOC entry 3525 (class 0 OID 16441)
--- Dependencies: 232
 -- Data for Name: role_permissions; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
@@ -819,8 +743,6 @@ INSERT INTO auth.role_permissions VALUES (4, 15, '2025-04-20 22:38:50.195169+00'
 
 
 --
--- TOC entry 3527 (class 0 OID 16446)
--- Dependencies: 234
 -- Data for Name: roles; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
@@ -831,16 +753,12 @@ INSERT INTO auth.roles VALUES (4, 'Felhasználó', 'Alapszintű felhasználói s
 
 
 --
--- TOC entry 3529 (class 0 OID 16454)
--- Dependencies: 236
 -- Data for Name: sessions; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 
 
 --
--- TOC entry 3531 (class 0 OID 16462)
--- Dependencies: 238
 -- Data for Name: user_groups; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
@@ -850,8 +768,6 @@ INSERT INTO auth.user_groups VALUES (3, 3, '2025-04-20 22:38:50.248243+00');
 
 
 --
--- TOC entry 3532 (class 0 OID 16466)
--- Dependencies: 239
 -- Data for Name: user_roles; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
@@ -864,8 +780,6 @@ INSERT INTO auth.user_roles VALUES (3, 4, '2025-04-20 22:38:50.271174+00');
 
 
 --
--- TOC entry 3533 (class 0 OID 16470)
--- Dependencies: 240
 -- Data for Name: users; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
@@ -875,16 +789,12 @@ INSERT INTO auth.users VALUES (3, 'Tartalomszerkesztő', 'content_editor@example
 
 
 --
--- TOC entry 3535 (class 0 OID 16479)
--- Dependencies: 242
 -- Data for Name: verifications; Type: TABLE DATA; Schema: auth; Owner: -
 --
 
 
 
 --
--- TOC entry 3554 (class 0 OID 0)
--- Dependencies: 219
 -- Name: accounts_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
@@ -892,8 +802,6 @@ SELECT pg_catalog.setval('auth.accounts_id_seq', 3, true);
 
 
 --
--- TOC entry 3555 (class 0 OID 0)
--- Dependencies: 221
 -- Name: audit_logs_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
@@ -901,8 +809,6 @@ SELECT pg_catalog.setval('auth.audit_logs_id_seq', 1, false);
 
 
 --
--- TOC entry 3556 (class 0 OID 0)
--- Dependencies: 223
 -- Name: group_permissions_group_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
@@ -910,8 +816,6 @@ SELECT pg_catalog.setval('auth.group_permissions_group_id_seq', 1, false);
 
 
 --
--- TOC entry 3557 (class 0 OID 0)
--- Dependencies: 225
 -- Name: groups_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
@@ -919,8 +823,6 @@ SELECT pg_catalog.setval('auth.groups_id_seq', 1, false);
 
 
 --
--- TOC entry 3558 (class 0 OID 0)
--- Dependencies: 227
 -- Name: permissions_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
@@ -928,8 +830,6 @@ SELECT pg_catalog.setval('auth.permissions_id_seq', 1, false);
 
 
 --
--- TOC entry 3559 (class 0 OID 0)
--- Dependencies: 229
 -- Name: providers_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
@@ -937,8 +837,6 @@ SELECT pg_catalog.setval('auth.providers_id_seq', 4, true);
 
 
 --
--- TOC entry 3560 (class 0 OID 0)
--- Dependencies: 231
 -- Name: resources_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
@@ -946,8 +844,6 @@ SELECT pg_catalog.setval('auth.resources_id_seq', 1, false);
 
 
 --
--- TOC entry 3561 (class 0 OID 0)
--- Dependencies: 233
 -- Name: role_permissions_role_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
@@ -955,8 +851,6 @@ SELECT pg_catalog.setval('auth.role_permissions_role_id_seq', 1, false);
 
 
 --
--- TOC entry 3562 (class 0 OID 0)
--- Dependencies: 235
 -- Name: roles_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
@@ -964,8 +858,6 @@ SELECT pg_catalog.setval('auth.roles_id_seq', 1, false);
 
 
 --
--- TOC entry 3563 (class 0 OID 0)
--- Dependencies: 237
 -- Name: sessions_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
@@ -973,8 +865,6 @@ SELECT pg_catalog.setval('auth.sessions_id_seq', 1, false);
 
 
 --
--- TOC entry 3564 (class 0 OID 0)
--- Dependencies: 241
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
@@ -982,8 +872,6 @@ SELECT pg_catalog.setval('auth.users_id_seq', 3, true);
 
 
 --
--- TOC entry 3565 (class 0 OID 0)
--- Dependencies: 243
 -- Name: verifications_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: -
 --
 
@@ -991,7 +879,6 @@ SELECT pg_catalog.setval('auth.verifications_id_seq', 1, false);
 
 
 --
--- TOC entry 3313 (class 2606 OID 16500)
 -- Name: accounts accounts_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1000,7 +887,6 @@ ALTER TABLE ONLY auth.accounts
 
 
 --
--- TOC entry 3315 (class 2606 OID 16502)
 -- Name: audit_logs audit_logs_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1009,7 +895,6 @@ ALTER TABLE ONLY auth.audit_logs
 
 
 --
--- TOC entry 3317 (class 2606 OID 16504)
 -- Name: group_permissions group_permissions_group_id_permission_id_pk; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1018,7 +903,6 @@ ALTER TABLE ONLY auth.group_permissions
 
 
 --
--- TOC entry 3319 (class 2606 OID 16506)
 -- Name: groups groups_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1027,7 +911,6 @@ ALTER TABLE ONLY auth.groups
 
 
 --
--- TOC entry 3321 (class 2606 OID 16508)
 -- Name: permissions permissions_name_unique; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1036,7 +919,6 @@ ALTER TABLE ONLY auth.permissions
 
 
 --
--- TOC entry 3323 (class 2606 OID 16510)
 -- Name: permissions permissions_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1045,7 +927,6 @@ ALTER TABLE ONLY auth.permissions
 
 
 --
--- TOC entry 3325 (class 2606 OID 16512)
 -- Name: providers providers_name_unique; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1054,7 +935,6 @@ ALTER TABLE ONLY auth.providers
 
 
 --
--- TOC entry 3327 (class 2606 OID 16514)
 -- Name: providers providers_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1063,7 +943,6 @@ ALTER TABLE ONLY auth.providers
 
 
 --
--- TOC entry 3329 (class 2606 OID 16516)
 -- Name: resources resources_name_unique; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1072,7 +951,6 @@ ALTER TABLE ONLY auth.resources
 
 
 --
--- TOC entry 3331 (class 2606 OID 16518)
 -- Name: resources resources_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1081,7 +959,6 @@ ALTER TABLE ONLY auth.resources
 
 
 --
--- TOC entry 3333 (class 2606 OID 16520)
 -- Name: role_permissions role_permissions_role_id_permission_id_pk; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1090,7 +967,6 @@ ALTER TABLE ONLY auth.role_permissions
 
 
 --
--- TOC entry 3335 (class 2606 OID 16522)
 -- Name: roles roles_name_unique; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1099,7 +975,6 @@ ALTER TABLE ONLY auth.roles
 
 
 --
--- TOC entry 3337 (class 2606 OID 16524)
 -- Name: roles roles_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1108,7 +983,6 @@ ALTER TABLE ONLY auth.roles
 
 
 --
--- TOC entry 3339 (class 2606 OID 16526)
 -- Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1117,7 +991,6 @@ ALTER TABLE ONLY auth.sessions
 
 
 --
--- TOC entry 3341 (class 2606 OID 16528)
 -- Name: sessions sessions_token_unique; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1126,7 +999,6 @@ ALTER TABLE ONLY auth.sessions
 
 
 --
--- TOC entry 3343 (class 2606 OID 16530)
 -- Name: user_groups user_groups_user_id_group_id_pk; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1135,7 +1007,6 @@ ALTER TABLE ONLY auth.user_groups
 
 
 --
--- TOC entry 3345 (class 2606 OID 16532)
 -- Name: user_roles user_roles_user_id_role_id_pk; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1144,7 +1015,6 @@ ALTER TABLE ONLY auth.user_roles
 
 
 --
--- TOC entry 3347 (class 2606 OID 16534)
 -- Name: users users_email_unique; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1153,7 +1023,6 @@ ALTER TABLE ONLY auth.users
 
 
 --
--- TOC entry 3349 (class 2606 OID 16536)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1162,7 +1031,6 @@ ALTER TABLE ONLY auth.users
 
 
 --
--- TOC entry 3351 (class 2606 OID 16538)
 -- Name: users users_username_unique; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1171,7 +1039,6 @@ ALTER TABLE ONLY auth.users
 
 
 --
--- TOC entry 3353 (class 2606 OID 16540)
 -- Name: verifications verifications_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1180,7 +1047,6 @@ ALTER TABLE ONLY auth.verifications
 
 
 --
--- TOC entry 3354 (class 2606 OID 16541)
 -- Name: accounts accounts_user_id_users_id_fk; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1189,7 +1055,6 @@ ALTER TABLE ONLY auth.accounts
 
 
 --
--- TOC entry 3355 (class 2606 OID 16546)
 -- Name: audit_logs audit_logs_user_id_users_id_fk; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1198,7 +1063,6 @@ ALTER TABLE ONLY auth.audit_logs
 
 
 --
--- TOC entry 3356 (class 2606 OID 16551)
 -- Name: group_permissions group_permissions_group_id_groups_id_fk; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1207,7 +1071,6 @@ ALTER TABLE ONLY auth.group_permissions
 
 
 --
--- TOC entry 3357 (class 2606 OID 16556)
 -- Name: group_permissions group_permissions_permission_id_permissions_id_fk; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1216,7 +1079,6 @@ ALTER TABLE ONLY auth.group_permissions
 
 
 --
--- TOC entry 3358 (class 2606 OID 16561)
 -- Name: permissions permissions_resource_id_resources_id_fk; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1225,7 +1087,6 @@ ALTER TABLE ONLY auth.permissions
 
 
 --
--- TOC entry 3359 (class 2606 OID 16566)
 -- Name: role_permissions role_permissions_permission_id_permissions_id_fk; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1234,7 +1095,6 @@ ALTER TABLE ONLY auth.role_permissions
 
 
 --
--- TOC entry 3360 (class 2606 OID 16571)
 -- Name: role_permissions role_permissions_role_id_roles_id_fk; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1243,7 +1103,6 @@ ALTER TABLE ONLY auth.role_permissions
 
 
 --
--- TOC entry 3361 (class 2606 OID 16576)
 -- Name: sessions sessions_user_id_users_id_fk; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1252,7 +1111,6 @@ ALTER TABLE ONLY auth.sessions
 
 
 --
--- TOC entry 3362 (class 2606 OID 16581)
 -- Name: user_groups user_groups_group_id_groups_id_fk; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1261,7 +1119,6 @@ ALTER TABLE ONLY auth.user_groups
 
 
 --
--- TOC entry 3363 (class 2606 OID 16586)
 -- Name: user_groups user_groups_user_id_users_id_fk; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1270,7 +1127,6 @@ ALTER TABLE ONLY auth.user_groups
 
 
 --
--- TOC entry 3364 (class 2606 OID 16591)
 -- Name: user_roles user_roles_role_id_roles_id_fk; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
@@ -1279,15 +1135,12 @@ ALTER TABLE ONLY auth.user_roles
 
 
 --
--- TOC entry 3365 (class 2606 OID 16596)
 -- Name: user_roles user_roles_user_id_users_id_fk; Type: FK CONSTRAINT; Schema: auth; Owner: -
 --
 
 ALTER TABLE ONLY auth.user_roles
     ADD CONSTRAINT user_roles_user_id_users_id_fk FOREIGN KEY (user_id) REFERENCES auth.users(id);
 
-
--- Completed on 2025-04-22 21:57:43 CEST
 
 --
 -- PostgreSQL database dump complete
