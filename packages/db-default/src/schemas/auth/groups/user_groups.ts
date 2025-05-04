@@ -4,8 +4,8 @@ import { users } from '../users/users'
 import { groups } from './groups'
 import { authSchema as schema } from '../schema'
 
-import { createInsertSchema } from 'drizzle-zod'
-import { z } from 'zod'
+import { createInsertSchema } from 'drizzle-valibot'
+import * as v from 'valibot'
 
 const userGroups = schema.table(
 	'user_groups',
@@ -31,5 +31,5 @@ const relations = drizzleRelations(userGroups, ({ one }) => ({
 const userGroupsSchema = createInsertSchema(userGroups)
 
 export { userGroups, relations as userGroupsRelations, userGroupsSchema }
-export type UserGroupSchema = z.infer<typeof userGroupsSchema>
+export type UserGroupSchema = v.InferOutput<typeof userGroupsSchema>
 export type UserGroupSelectModel = InferSelectModel<typeof userGroups>

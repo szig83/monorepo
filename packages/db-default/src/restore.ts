@@ -2,12 +2,11 @@ import chalk from 'chalk'
 import { client } from './index'
 import {
 	deleteSchemas,
-	findSchemas,
+	getSchemasFromOrm,
+	getSchemasFromDB,
 	getLatestBackupFile,
 	createSnapshot,
 	restore,
-	dropDatabase,
-	createDatabase,
 } from '@/lib/utils'
 import * as cm from '@/lib/consoleMessage'
 
@@ -23,7 +22,7 @@ async function start() {
 
 	if (backupFile) {
 		// Sémák keresése (orm séma szerkezetből)
-		const schemas = findSchemas(stopOnError)
+		const schemas = getSchemasFromOrm(stopOnError)
 
 		if (schemas.length > 0) {
 			// Biztonsági mentés készítése a meglévő adatbázisról
@@ -36,6 +35,17 @@ async function start() {
 				let needToRestoreSnapshot = false
 
 				if (deleteSchemaResult.isSuccess) {
+					// Maradék séma lekérése az adatbázisból
+					const dbSchemas = (await getSchemasFromDB(stopOnError, 'Maradék séma lekérése'))
+						.schemas
+					if (dbSchemas.length > 0) {
+						if (
+							(await deleteSchemas(dbSchemas, stopOnError, 'Maradék séma törlése'))
+								.deletedSchemas.length > 0
+						) {
+							needToRestoreSnapshot = true
+						}
+					}
 					// Adatbázis betöltése a backup fájlból
 					const loadDatabase: boolean = await restore(backupFile, stopOnError)
 
@@ -68,7 +78,7 @@ async function start() {
 	}
 }
 
-start().catch((error) => {
-	console.error(chalk.red('\n🔥 Váratlan hiba történt a visszaállítási folyamat során:'), error)
+start().catch((e) => {
+	console.error(chalk.red('\n🔥 Váratlan hiba történt a visszaállítási folyamat során:'), e)
 	process.exit(1)
 })

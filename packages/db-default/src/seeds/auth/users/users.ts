@@ -3,7 +3,7 @@ import { type DB } from '@/index'
 import * as schema from '@/schemas'
 import { type PgDatabase } from 'drizzle-orm/pg-core'
 import { type NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
-import { seedConfig } from '@/seedConfig'
+import { seedConfig } from '@/lib/seedConfig'
 import { hashPassword } from '@repo/utils/common'
 import { faker } from '@faker-js/faker'
 
@@ -75,7 +75,12 @@ const addUser = async (
 				email: userConfig.email,
 				emailVerified: true,
 			})
-			.returning({ id: schema.users.id, email: schema.users.email, name: schema.users.name, password: schema.users.name })
+			.returning({
+				id: schema.users.id,
+				email: schema.users.email,
+				name: schema.users.name,
+				password: schema.users.name,
+			})
 
 		const insertedUser = userResult[0]
 		if (!insertedUser) {

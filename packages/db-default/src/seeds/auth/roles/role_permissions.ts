@@ -1,6 +1,6 @@
 import { type DB } from '@/index'
 import { rolePermissions } from '@/schemas'
-import { rolePermissions as rolePermissionsSeedConfig } from '@/seedConfig'
+import { rolePermissions as rolePermissionsSeedConfig } from '@/lib/seedConfig'
 
 /**
  * Inicializálja a szerepkör-jogosultság kapcsolatokat a seedConfig-ban megadott adatokkal.

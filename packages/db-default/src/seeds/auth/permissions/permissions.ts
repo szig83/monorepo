@@ -1,6 +1,6 @@
 import { type DB } from '@/index'
 import { permissions } from '@/schemas'
-import { permissions as permissionsSeedConfig } from '@/seedConfig'
+import { permissions as permissionsSeedConfig } from '@/lib/seedConfig'
 
 const initData = Object.values(permissionsSeedConfig)
 

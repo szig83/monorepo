@@ -3,8 +3,9 @@
  * Szerver és kliens oldalon is használható segéd függvények, típusok
  */
 
-import { z } from 'zod'
 import crypto from 'crypto'
+import * as v from 'valibot'
+
 /**
  * A bemeneti string első karakterét nagybetűsre alakítja.
  * @param input Átalakítandó string
@@ -15,24 +16,23 @@ export function capitalizeFirstLetter(input: string): string {
 	return input.charAt(0).toUpperCase() + input.slice(1)
 }
 
-/**
- * Nyelvi lokalizációhoz szükséges típus
- */
-export type LocalizedText = {
-	hu: string
-	en: string
-	[key: string]: string // További nyelvek
-}
+const nonEmptyString = v.pipe(
+	v.string('A fordításnak stringnek kell lennie.'),
+	v.minLength(1, 'A fordítás nem lehet üres.'),
+)
 
-/**
- * Nyelvi lokalizációhoz szükséges validációs zod schema
- */
-export const localizedTextSchema = z
-	.object({
-		hu: z.string().min(1),
-		en: z.string().min(1),
-	})
-	.catchall(z.string()) // Bármilyen további nyelv is megengedett
+export const localizedTextSchema = v.objectWithRest(
+	// 1. Explicit kulcsok definíciója
+	{
+		hu: nonEmptyString,
+		en: nonEmptyString,
+	},
+	// 2. Séma az összes többi ("rest") kulcsra
+	nonEmptyString,
+)
+
+// Type helper (optional but good practice)
+export type LocalizedText = v.InferOutput<typeof localizedTextSchema>
 
 /**
  * Hash a password using scrypt algorithm to match Better Auth's hashing implementation

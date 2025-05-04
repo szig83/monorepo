@@ -1,6 +1,6 @@
 import { type DB } from '@/index'
 import { userRoles } from '@/schemas'
-import { userRoles as userRolesSeedConfig } from '@/seedConfig'
+import { userRoles as userRolesSeedConfig } from '@/lib/seedConfig'
 
 /**
  * Inicializálja a felhasználó-szerepkör kapcsolatokat a seedConfig-ban megadott adatokkal.

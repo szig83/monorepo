@@ -1,11 +1,10 @@
-import { jsonb, timestamp, serial } from 'drizzle-orm/pg-core'
+import { jsonb, serial, timestamp } from 'drizzle-orm/pg-core'
 import { relations as drizzleRelations, InferSelectModel } from 'drizzle-orm'
 import { userGroups } from './user_groups'
 import { authSchema as schema } from '../schema'
-
-import { createInsertSchema } from 'drizzle-zod'
-import { z } from 'zod'
-import { localizedTextSchema, type LocalizedText } from '@repo/utils/common'
+import { createInsertSchema } from 'drizzle-valibot'
+import * as v from 'valibot'
+import { type LocalizedText } from '@repo/utils/common'
 
 const groups = schema.table('groups', {
 	id: serial('id').primaryKey(),
@@ -20,10 +19,15 @@ const relations = drizzleRelations(groups, ({ many }) => ({
 }))
 
 const groupSchema = createInsertSchema(groups, {
-	name: localizedTextSchema,
-	description: localizedTextSchema.partial().optional(),
+	name: v.intersect([
+		v.object({
+			hu: v.string(),
+			en: v.string(),
+		}),
+		v.record(v.string(), v.optional(v.string())),
+	]),
 })
 
 export { groups, relations as groupsRelations, groupSchema }
-export type GroupSchema = z.infer<typeof groupSchema>
+export type GroupSchema = v.InferOutput<typeof groupSchema>
 export type GroupSelectModel = InferSelectModel<typeof groups>

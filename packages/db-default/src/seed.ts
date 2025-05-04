@@ -3,14 +3,22 @@ import * as fs from 'fs'
 import chalk from 'chalk'
 import { sql } from 'drizzle-orm'
 import { getTableConfig } from 'drizzle-orm/pg-core'
+import { client } from './index'
 
 import db from './index'
 import * as schema from './schemas'
 import * as seeds from './seeds'
-import { env } from './env'
+import { env } from '@/lib/env'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
 import config from '@/../drizzle.config'
-import { deleteSchemas, findSchemas } from './utils'
+import {
+	deleteSchemas,
+	getSchemasFromOrm,
+	createSnapshot,
+	getSchemasFromDB,
+	restore,
+} from '@/lib/utils'
+import * as cm from '@/lib/consoleMessage'
 
 type SeedOptions = {
 	tableReset: boolean
@@ -43,7 +51,15 @@ function getSchemaTableNames(): string[] {
 /**
  * Kiüríti az összes táblát fordított függőségi sorrendben.
  */
-async function resetTables() {
+async function resetTables(stopOnError: boolean): Promise<boolean> {
+	let isSuccess = false
+	cm.startProcess('Táblák kiürítése')
+	if (!seedOptions.tableReset) {
+		cm.subProcess('Táblák kiürítése - KIHAGYVA', 'info')
+		cm.endProcess('Táblák kiürítése', 'success')
+		return true
+	}
+
 	// Az összes tábla kiürítése fordított függőségi sorrendben
 	const tablesToReset = [
 		// Kapcsolótáblák (junction tables) - először ezeket kell törölni
@@ -71,7 +87,6 @@ async function resetTables() {
 
 	const schemaTables = getSchemaTableNames()
 
-	console.log(chalk.blue.bold('[Táblák kiürítése - START]'))
 	for (const table of tablesToReset) {
 		const tableConfig = getTableConfig(table)
 		try {
@@ -83,9 +98,7 @@ async function resetTables() {
 				schemaTables.splice(index, 1)
 			}
 
-			console.log(
-				`   ${chalk.green('✔')} ${chalk.cyan(tableConfig.name)} sikeresen kiürítve`,
-			)
+			cm.subProcess('Sikeresen kiürítve:', 'success', tableConfig.name)
 		} catch (error: unknown) {
 			// Check if the error is a PostgreSQL 'table does not exist' error (code 42P01)
 			if (
@@ -94,74 +107,115 @@ async function resetTables() {
 				'code' in error &&
 				error.code === '42P01'
 			) {
-				console.warn(
-					`   ${chalk.yellow('⚠️')} A(z) '${chalk.cyan(tableConfig.name)}' tábla nem létezik, a kiürítés kihagyva.`,
-				)
+				cm.subProcess('Tábla nem létezik:', 'warning', tableConfig.name)
 			} else {
 				// Log other errors
-				console.error(
-					`   ${chalk.red('❌')} Hiba a(z) '${chalk.cyan(tableConfig.name)}' tábla kiürítése közben:`,
-					error,
-				)
-				// Optionally re-throw or handle differently if seeding should stop on other errors
+				cm.subProcess('Hiba a tábla kiürítése közben', 'error', tableConfig.name)
+				const errorMessage = error instanceof Error ? error.message : String(error)
+				cm.consoleMessage(errorMessage, 'error', 1)
+				if (stopOnError) {
+					cm.endProcess('Táblák kiürítése', 'error')
+					process.exit(1)
+				}
 			}
 		}
 	}
 
 	if (schemaTables.length > 0) {
-		console.log(
-			chalk.red.bold('🔴 A következő táblák hiányoznak a kiürítési folyamatból:'),
-			chalk.red(schemaTables.join(', ')),
-		)
-		console.log(chalk.yellow.bold('[Táblák kiürítése - VÉGE | 🟡 Részlegesen kiürítve]') + '\n')
+		cm.subProcess('Hiányzó táblák:', 'warning', schemaTables.join(', '))
 	} else {
-		console.log(chalk.green.bold('[Táblák kiürítése - VÉGE | 🟢 Sikeresen kiürítve]') + '\n')
+		isSuccess = true
 	}
+
+	cm.endProcess('Táblák kiürítése', isSuccess ? 'success' : 'error')
+
+	return isSuccess
 }
 
 /**
  * Kiindulási tábla adatok betöltése.
  */
-async function seedTableData() {
-	console.log(chalk.blue.bold('[Tábla adatok betöltése - START]'))
+async function seedTableData(stopOnError: boolean): Promise<boolean> {
+	async function seedData(step: string, text: string): Promise<boolean> {
+		let isSuccess = false
+		cm.startProcess(text)
+		try {
+			switch (step) {
+				case 'baseEntities': {
+					await seeds.resources(db)
+					await seeds.providers(db)
+					await seeds.groups(db)
+					await seeds.roles(db)
+					cm.subProcess(
+						'Erőforrások, Szolgáltatók, Csoportok, Szerepkörök betöltése...',
+						'success',
+					)
+					break
+				}
+				case 'permissions': {
+					await seeds.permissions(db)
+					cm.subProcess('Jogosultságok betöltése...', 'success')
+					break
+				}
+				case 'connections': {
+					await seeds.rolePermissions(db) // Szerepkör-jogosultság kapcsolatok
+					await seeds.groupPermissions(db) // Csoport-jogosultság kapcsolatok
+					cm.subProcess(
+						'Szerepkör-jogosultság és Csoport-jogosultság kapcsolatok betöltése...',
+						'success',
+					)
+					break
+				}
+				case 'users': {
+					await seeds.users(db, seedOptions.publicUserCount) // Felhasználók
+					await seeds.userRoles(db) // Felhasználó-szerepkör kapcsolatok
+					cm.subProcess(
+						'Felhasználók és Felhasználó-szerepkör kapcsolatok betöltése...',
+						'success',
+					)
+					break
+				}
+			}
+			isSuccess = true
+		} catch (error) {
+			isSuccess = false
+			cm.subProcess('Hiba a betöltés során', 'error', text)
+			const errorMessage = error instanceof Error ? error.message : String(error)
+			cm.consoleMessage(errorMessage, 'error', 1)
+			if (stopOnError) {
+				cm.endProcess(text, 'error')
+				process.exit(1)
+			}
+		}
+		cm.endProcess(text, isSuccess ? 'success' : 'error')
+		return isSuccess
+	}
 
-	console.group(chalk.cyan('1. Alapentitások'))
-	console.log(chalk.gray('Erőforrások, Szolgáltatók, Csoportok, Szerepkörök betöltése...'))
-	await seeds.resources(db) // Erőforrások
-	await seeds.providers(db) // Hitelesítési szolgáltatók
-	await seeds.groups(db) // Csoportok
-	await seeds.roles(db) // Szerepkörök
-	console.log(chalk.green('✔ Kész'))
-	console.groupEnd()
+	let isSuccess = false
+	cm.startProcess('Tábla adatok betöltése')
 
-	console.group(chalk.cyan('2. Jogosultságok'))
-	console.log(chalk.gray('Jogosultságok betöltése...'))
-	await seeds.permissions(db) // Jogosultságok
-	console.log(chalk.green('✔ Kész'))
-	console.groupEnd()
+	isSuccess = await seedData('baseEntities', 'Alapentitások')
+	isSuccess = isSuccess && (await seedData('permissions', 'Jogosultságok'))
+	isSuccess = isSuccess && (await seedData('connections', 'Kapcsolatok'))
+	isSuccess = isSuccess && (await seedData('users', 'Felhasználók'))
 
-	console.group(chalk.cyan('3. Kapcsolatok'))
-	console.log(chalk.gray('Szerepkör-jogosultság és Csoport-jogosultság kapcsolatok betöltése...'))
-	await seeds.rolePermissions(db) // Szerepkör-jogosultság kapcsolatok
-	await seeds.groupPermissions(db) // Csoport-jogosultság kapcsolatok
-	console.log(chalk.green('✔ Kész'))
-	console.groupEnd()
-
-	console.group(chalk.cyan('4. Felhasználók és kapcsolataik'))
-	console.log(chalk.gray('Felhasználók és Felhasználó-szerepkör kapcsolatok betöltése...'))
-	await seeds.users(db, seedOptions.publicUserCount) // Felhasználók
-	await seeds.userRoles(db) // Felhasználó-szerepkör kapcsolatok
-	console.log(chalk.green('✔ Kész'))
-	console.groupEnd()
-
-	console.log(chalk.green.bold('[Tábla adatok betöltése - VÉGE | 🟢 Sikeresen betöltve]') + '\n')
+	cm.endProcess('Tábla adatok betöltése', isSuccess ? 'success' : 'error')
+	return isSuccess
 }
 
 /**
  * Betölti a tárolt eljárásokat.
  */
-async function seedStoredProcedures() {
-	console.log(chalk.blue.bold('[Tárolt eljárások betöltése - START]'))
+async function seedStoredProcedures(stopOnError: boolean): Promise<boolean> {
+	let isSuccess = false
+	cm.startProcess('Tárolt eljárások betöltése')
+
+	if (!seedOptions.storedProcedures) {
+		cm.subProcess('Tárolt eljárások betöltése - KIHAGYVA', 'info')
+		cm.endProcess('Tárolt eljárások betöltése', 'success')
+		return true
+	}
+
 	const proceduresDir = path.join(__dirname, 'procedures')
 	// Recursive function to find all SQL files in a directory and its subdirectories
 	function findSqlFiles(dir: string): string[] {
@@ -187,94 +241,169 @@ async function seedStoredProcedures() {
 	const sqlFilePaths = findSqlFiles(proceduresDir)
 
 	for (const filePath of sqlFilePaths) {
-		const procedureSQL = fs.readFileSync(filePath, 'utf8')
-		await db.execute(sql.raw(procedureSQL))
+		try {
+			const procedureSQL = fs.readFileSync(filePath, 'utf8')
+			await db.execute(sql.raw(procedureSQL))
 
-		// Check if there is a corresponding .d.ts file
-		const basePath = filePath.slice(0, -4) // Remove '.sql' extension
-		const dtsPath = `${basePath}.d.ts`
-		const hasDtsFile = fs.existsSync(dtsPath)
+			// Check if there is a corresponding .d.ts file
+			const basePath = filePath.slice(0, -4) // Remove '.sql' extension
+			const dtsPath = `${basePath}.d.ts`
+			const hasDtsFile = fs.existsSync(dtsPath)
 
-		console.log(
-			`   ${chalk.green('✔')} ${chalk.cyan(path.relative(proceduresDir, filePath))} ${hasDtsFile ? chalk.green(' (d.ts OK)') : chalk.red.bold(' (d.ts HIÁNYZIK: ' + path.relative(proceduresDir, dtsPath) + ')')}`,
-		)
+			cm.subProcess(
+				'Tárolt eljárás betöltése:',
+				'success',
+				path.relative(proceduresDir, filePath),
+			)
+			if (hasDtsFile) {
+				cm.subProcess('Típus fájl megtalálva', 'success', '', 2)
+			} else {
+				cm.subProcess(
+					'Hiányzó típus fájl',
+					'error',
+					path.relative(proceduresDir, dtsPath),
+					2,
+				)
+			}
+			isSuccess = true
+		} catch (error) {
+			isSuccess = false
+			cm.subProcess('Hiba a betöltés során', 'error', path.relative(proceduresDir, filePath))
+			const errorMessage = error instanceof Error ? error.message : String(error)
+			cm.consoleMessage(errorMessage, 'error', 1)
+			if (stopOnError) {
+				cm.endProcess('Tárolt eljárások betöltése', 'error')
+				process.exit(1)
+			}
+		}
 	}
-	console.log(
-		chalk.green.bold('[Tárolt eljárások betöltése - VÉGE | 🟢 Sikeresen betöltve]') + '\n',
-	)
+	cm.endProcess('Tárolt eljárások betöltése', isSuccess ? 'success' : 'error')
+
+	return isSuccess
 }
 
 /**
  * Create specified schemas if they don't exist.
  */
-async function createSchemas() {
-	const schemas = findSchemas()
+async function createSchemas(schemas: string[], stopOnError: boolean) {
+	let isSuccess = false
+	cm.startProcess('Sémák létrehozása')
 
-	// --- Sémák törlése ---
-	await deleteSchemas(schemas)
-
-	console.log(chalk.blue.bold('[Sémák létrehozása - START]'))
 	for (const schemaName of schemas) {
 		try {
-			// Use 'CREATE SCHEMA IF NOT EXISTS' to avoid errors if the schema already exists.
 			await db.execute(sql.raw(`CREATE SCHEMA IF NOT EXISTS ${schemaName};`))
-			console.log(
-				`   ${chalk.green('✔')} Séma '${chalk.cyan(schemaName)}' létrehozva vagy már létezik.`,
-			)
+			cm.subProcess(`Séma létrehozva:`, 'success', schemaName)
+			isSuccess = true
 		} catch (error) {
-			console.error(
-				`   ${chalk.red('❌')} Hiba a(z) '${chalk.cyan(schemaName)}' séma létrehozása közben:`,
-				error,
-			)
-			// Decide if we should stop execution or continue
-			// For now, let's log the error and continue
+			isSuccess = false
+			cm.subProcess(`Hiba a(z) '${schemaName}' séma létrehozása közben`, 'error')
+			const errorMessage = error instanceof Error ? error.message : String(error)
+			cm.consoleMessage(errorMessage, 'error', 1)
+			if (stopOnError) {
+				cm.endProcess('Sémák létrehozása', 'error')
+				process.exit(1)
+			}
 		}
 	}
-	console.log(chalk.green.bold('[Sémák létrehozása - VÉGE | 🟢 Sikeresen létrehozva]') + '\n')
+	cm.endProcess('Sémák létrehozása', isSuccess ? 'success' : 'error')
+
+	return isSuccess
+}
+
+async function migrateSchemas(stopOnError: boolean) {
+	let isSuccess = false
+	cm.startProcess('Migrációk futtatása')
+
+	try {
+		await migrate(db, { migrationsFolder: config.out! })
+		cm.endProcess('Migrációk futtatása', 'success')
+		isSuccess = true
+	} catch (error) {
+		cm.endProcess('Migrációk futtatása', 'error')
+		const errorMessage = error instanceof Error ? error.message : String(error)
+		cm.consoleMessage(errorMessage, 'error', 1)
+		if (stopOnError) {
+			process.exit(1)
+		}
+	}
+
+	return isSuccess
 }
 
 /**
  * Seed adatok betöltése.
  */
-async function main() {
-	console.log('\n' + chalk.bold.underline('🚀 ADATBÁZIS SEEDELÉS INDÍTÁSA') + '\n')
+async function start() {
+	let isSuccess = false
+	const stopOnError = false // Leállítsa-e a teljes folyamat futását hiba esetén (process.exit(1))
 
-	// Sémák létrehozása
-	await createSchemas()
+	cm.startScript('Adatbázis seedelés indítása')
+	cm.subProcess('Adatbázis kapcsolat létrehozva', 'success', '', 0, true)
 
-	// Migrációk futtatása
-	console.log(chalk.blue.bold('[Migrációk futtatása - START]'))
-	console.log(chalk.gray(`Migrációs könyvtár: ${config.out}`))
-	await migrate(db, { migrationsFolder: config.out! })
-	console.log(chalk.green.bold('[Migrációk futtatása - VÉGE | 🟢 Sikeresen futtatva]') + '\n')
+	const schemas = getSchemasFromOrm(stopOnError)
 
-	// Táblák kiürítése
-	if (seedOptions.tableReset) {
-		await resetTables()
-	} else {
-		console.log(chalk.yellow.bold('[Táblák kiürítése - KIHAGYVA]') + '\n')
+	if (schemas.length > 0) {
+		// Biztonsági mentés készítése a meglévő adatbázisról
+		const databaseSnapshot = await createSnapshot(stopOnError)
+		if (databaseSnapshot) {
+			// Sémák törlése az adatbázisból
+			const deleteSchemaResult = await deleteSchemas(schemas)
+			let needToRestoreSnapshot = false
+			if (deleteSchemaResult.isSuccess) {
+				// Maradék séma lekérése az adatbázisból
+				const dbSchemas = (await getSchemasFromDB(stopOnError, 'Maradék séma lekérése'))
+					.schemas
+				if (dbSchemas.length > 0) {
+					if (
+						(await deleteSchemas(dbSchemas, stopOnError, 'Maradék séma törlése'))
+							.deletedSchemas.length > 0
+					) {
+						needToRestoreSnapshot = true
+					}
+				}
+				// Sémák létrehozása
+				const createSchemasResult = await createSchemas(schemas, stopOnError)
+				if (createSchemasResult) {
+					const migrateResult = await migrateSchemas(stopOnError)
+					if (migrateResult) {
+						// Táblák kiürítése
+						const resetTablesResult = await resetTables(stopOnError)
+						if (resetTablesResult) {
+							// Tárolt eljárások betöltése
+
+							const seedStoredProceduresResult =
+								await seedStoredProcedures(stopOnError)
+							if (seedStoredProceduresResult) {
+								const seedTableDataResult = await seedTableData(stopOnError)
+								if (seedTableDataResult) {
+									needToRestoreSnapshot = false
+									isSuccess = true
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// Ha a betöltés sikertelen volt (vagy részlegesen törlődtek sémák), akkor visszaállítjuk a snapshotot
+			if (needToRestoreSnapshot) {
+				await restore(databaseSnapshot, stopOnError, true)
+			}
+		}
 	}
 
-	// Tárolt eljárások betöltése
-	if (seedOptions.storedProcedures) {
-		await seedStoredProcedures()
+	await client.end()
+	cm.subProcess('Adatbázis kapcsolat bontva', 'success', '', 0, true)
+	if (isSuccess) {
+		console.log(chalk.underline('\n✨ ADATBÁZIS SEEDELÉS SIKERESEN BEFEJEZVE!') + '\n')
+		process.exit(0)
 	} else {
-		console.log(chalk.yellow.bold('[Tárolt eljárások betöltése - KIHAGYVA]') + '\n')
+		console.error(chalk.underline('\n🔥 ADATBÁZIS SEEDELÉS SIKERTELEN') + '\n')
+		process.exit(1)
 	}
-
-	// Kiindulási tábla adatok betöltése
-	await seedTableData()
-
-	console.log(chalk.bold.underline('✨ ADATBÁZIS SEEDELÉS BEFEJEZVE!') + '\n')
 }
 
-main()
-	.catch((e) => {
-		console.error(chalk.red.bold('💥 Hiba a seedelés során:'), e)
-		process.exit(1)
-	})
-	.finally(async () => {
-		// A végső üzenet már a main()-ben van, itt nincs szükség további logolásra.
-		// console.log('👌 Minden seed adat sikeresen betöltve!') // Ezt eltávolítjuk vagy kikommenteljük
-		process.exit(0)
-	})
+start().catch((e) => {
+	console.error(chalk.red.bold('\n🔥 Hiba a seedelés során:'), e)
+	process.exit(1)
+})

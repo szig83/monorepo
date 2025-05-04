@@ -1,6 +1,6 @@
 import { type DB } from '@/index'
 import { resources } from '@/schemas'
-import { resources as resourcesSeedConfig } from '@/seedConfig'
+import { resources as resourcesSeedConfig } from '@/lib/seedConfig'
 
 const initData = Object.values(resourcesSeedConfig)
 

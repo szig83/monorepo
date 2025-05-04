@@ -1,6 +1,6 @@
 import { type DB } from '@/index'
 import { groups, type GroupSchema } from '@/schemas'
-import { groups as groupSeedConfig } from '@/seedConfig'
+import { groups as groupSeedConfig } from '@/lib/seedConfig'
 
 const initData: GroupSchema[] = Object.values(groupSeedConfig)
 

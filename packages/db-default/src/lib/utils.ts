@@ -1,5 +1,4 @@
-import chalk from 'chalk'
-import { is, sql } from 'drizzle-orm'
+import { sql } from 'drizzle-orm'
 import db from '@/index'
 import * as path from 'path'
 import * as fs from 'fs'
@@ -16,16 +15,17 @@ import { format } from 'date-fns'
 export async function deleteSchemas(
 	schemasToDelete: string[],
 	stopOnError = true,
+	alternateProcessText?: string,
 ): Promise<{ isSuccess: boolean; deletedSchemas: string[] }> {
-	const processText = 'Sémák törlése'
+	const processText = alternateProcessText || 'Sémák törlése'
 	let isSuccess = true
 	const deletedSchemas: string[] = []
 	const silentDeleteSchemas = ['drizzle']
 
 	schemasToDelete.push('drizzle')
-	if (!schemasToDelete.includes('public')) {
+	/*if (!schemasToDelete.includes('public')) {
 		schemasToDelete.push('public')
-	}
+	}*/
 
 	cm.startProcess(processText)
 
@@ -161,8 +161,45 @@ export async function createSnapshot(stopOnError = true): Promise<string> {
 	return isSuccess ? snapshotFile : ''
 }
 
-export function findSchemas(stopOnError = true): string[] {
-	const processText = 'Sémák ellenőrzése'
+export async function getSchemasFromDB(
+	stopOnError = true,
+	alternateProcessText?: string,
+): Promise<{ isSuccess: boolean; schemas: string[] }> {
+	const processText = alternateProcessText || 'Sémák lekérése adatbázisból'
+	let isSuccess = false
+	cm.startProcess(processText)
+	let schemas: string[] = []
+	try {
+		const result = await db.execute(
+			sql.raw(
+				`SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog', 'information_schema', 'pg_toast');`,
+			),
+		)
+		schemas = result.rows.map((row) => row.schema_name as string)
+		if (schemas.length > 0) {
+			cm.subProcess('Talált sémák:', 'success', schemas.join(', '))
+		} else {
+			cm.subProcess('Nem található több séma az adatbázisban', 'info')
+		}
+		isSuccess = true
+	} catch (error) {
+		cm.subProcess('Hiba a séma lekérésekor', 'error')
+		const errorMessage = error instanceof Error ? error.message : String(error)
+		cm.consoleMessage(errorMessage, 'error', 1)
+		if (stopOnError) {
+			cm.endProcess(processText, 'error')
+			process.exit(1)
+		}
+	}
+	cm.endProcess(processText, isSuccess ? 'success' : 'error')
+	return {
+		isSuccess,
+		schemas,
+	}
+}
+
+export function getSchemasFromOrm(stopOnError = true): string[] {
+	const processText = 'Sémák lekérése ORM definícióból'
 	let isSuccess = false
 	let schemas: string[] = []
 

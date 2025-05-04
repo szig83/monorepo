@@ -1,6 +1,6 @@
 import { type DB } from '@/index'
 import { providers } from '@/schemas'
-import { providers as providersSeedConfig } from '@/seedConfig'
+import { providers as providersSeedConfig } from '@/lib/seedConfig'
 
 /**
  * Konvertálja a seedConfig szolgáltató adatokat a séma formátumára.

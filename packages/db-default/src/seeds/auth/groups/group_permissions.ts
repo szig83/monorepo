@@ -1,6 +1,6 @@
 import { type DB } from '@/index'
 import { groupPermissions } from '@/schemas'
-import { groupPermissions as groupPermissionsSeedConfig } from '@/seedConfig'
+import { groupPermissions as groupPermissionsSeedConfig } from '@/lib/seedConfig'
 
 /**
  * Inicializálja a csoport-jogosultság kapcsolatokat a seedConfig-ban megadott adatokkal.

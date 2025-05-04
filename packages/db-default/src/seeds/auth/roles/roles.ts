@@ -1,6 +1,6 @@
 import { type DB } from '@/index'
 import { roles } from '@/schemas'
-import { roles as rolesSeedConfig } from '@/seedConfig'
+import { roles as rolesSeedConfig } from '@/lib/seedConfig'
 
 const initData = Object.values(rolesSeedConfig)
 
