@@ -1,6 +1,6 @@
-const MAIN_ROOT_PATH = '/'
-const ADMIN_ROOT_PATH = '/admin'
-const API_ROOT_PATH = '/api'
+const MAIN_ROOT_PATH = '/';
+const ADMIN_ROOT_PATH = '/admin';
+const API_ROOT_PATH = '/api';
 
 export const MAIN_ROUTES = {
 	root: MAIN_ROOT_PATH,
@@ -10,7 +10,7 @@ export const MAIN_ROUTES = {
 	},
 	protected: ['user-profile'],
 	signIn: 'sign-in',
-}
+};
 
 export const ADMIN_ROUTES = {
 	root: ADMIN_ROOT_PATH,
@@ -20,13 +20,13 @@ export const ADMIN_ROUTES = {
 	},
 	protected: [ADMIN_ROOT_PATH],
 	signIn: 'sign-in',
-}
+};
 
 export const API_ROUTES = {
 	root: API_ROOT_PATH,
 	public: [],
 	protected: [],
-}
+};
 
 export const ALL_ROUTES = {
 	main: {
@@ -38,4 +38,4 @@ export const ALL_ROUTES = {
 	api: {
 		...API_ROUTES,
 	},
-}
+};

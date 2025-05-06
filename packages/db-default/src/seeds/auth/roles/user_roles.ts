@@ -1,6 +1,6 @@
-import { type DB } from '@/index'
-import { userRoles } from '@/schemas'
-import { userRoles as userRolesSeedConfig } from '@/lib/seedConfig'
+import type { DB } from '@/index';
+import { userRoles as userRolesSeedConfig } from '@/lib/seedConfig';
+import { userRoles } from '@/schemas';
 
 /**
  * Inicializálja a felhasználó-szerepkör kapcsolatokat a seedConfig-ban megadott adatokkal.
@@ -8,5 +8,5 @@ import { userRoles as userRolesSeedConfig } from '@/lib/seedConfig'
  * @param db Az adatbázis példány.
  */
 export async function seed(db: DB) {
-	await db.insert(userRoles).values(userRolesSeedConfig)
+	await db.insert(userRoles).values(userRolesSeedConfig);
 }

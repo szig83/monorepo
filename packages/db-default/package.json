@@ -1,39 +1,38 @@
 {
-    "name": "@repo/db-default",
-    "version": "0.1.0",
-    "private": true,
-    "type": "module",
-    "exports": {
-        "./db": "./src/index.ts",
-        "./schemas": "./src/schemas/index.ts"
-    },
-    "scripts": {
-        "db:generate": "dotenv -e ../../envs/.env.database.local -- cross-env DB_MIGRATING=true drizzle-kit generate",
-        "db:push": "dotenv -e ../../envs/.env.database.local -- cross-env DB_MIGRATING=true drizzle-kit push",
-        "db:migrate": "dotenv -e ../../envs/.env.database.local -- cross-env DB_MIGRATING=true bun src/migrate",
-        "db:seed": "dotenv -e ../../envs/.env.database.local -- bun src/seed.ts",
-        "db:restore": "dotenv -e ../../envs/.env.database.local -- bun src/restore.ts",
-        "lint": "eslint . --max-warnings 0",
-        "check-types": "tsc --noEmit",
-        "update:dep:latest": "ncu --target latest -ui --format group --install always --packageManager bun",
-        "update:dep:newest": "ncu --target newest -ui --format group --install always --packageManager bun",
-        "db:test": "dotenv -e ../../envs/.env.database.local -- bun src/test.ts"
-    },
-    "dependencies": {
-        "cross-env": "^7.0.3",
-        "date-fns": "^4.1.0",
-        "drizzle-orm": "^0.42.0",
-        "drizzle-valibot": "^0.4.1",
-        "pg": "^8.14.1",
-        "valibot": "^1.0.0"
-    },
-    "devDependencies": {
-        "@faker-js/faker": "^9.7.0",
-        "@repo/utils": "*",
-        "@types/node": "^22",
-        "@types/pg": "^8.11.13",
-        "chalk": "^5.4.1",
-        "drizzle-kit": "^0.31.0"
-    },
-    "packageManager": "bun@1.2.10"
+	"name": "@repo/db-default",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./db": "./src/index.ts",
+		"./schemas": "./src/schemas/index.ts"
+	},
+	"scripts": {
+		"db:generate": "dotenv -e ../../envs/.env.database.local -- cross-env DB_MIGRATING=true drizzle-kit generate",
+		"db:push": "dotenv -e ../../envs/.env.database.local -- cross-env DB_MIGRATING=true drizzle-kit push",
+		"db:migrate": "dotenv -e ../../envs/.env.database.local -- cross-env DB_MIGRATING=true bun src/migrate",
+		"db:seed": "dotenv -e ../../envs/.env.database.local -- bun src/seed.ts",
+		"db:restore": "dotenv -e ../../envs/.env.database.local -- bun src/restore.ts",
+		"check-types": "tsc --noEmit",
+		"update:dep:latest": "ncu --target latest -ui --format group --install always --packageManager bun",
+		"update:dep:newest": "ncu --target newest -ui --format group --install always --packageManager bun",
+		"db:test": "dotenv -e ../../envs/.env.database.local -- bun src/test.ts"
+	},
+	"dependencies": {
+		"cross-env": "^7.0.3",
+		"date-fns": "^4.1.0",
+		"drizzle-orm": "^0.42.0",
+		"drizzle-valibot": "^0.4.1",
+		"pg": "^8.14.1",
+		"valibot": "^1.0.0"
+	},
+	"devDependencies": {
+		"@faker-js/faker": "^9.7.0",
+		"@repo/utils": "*",
+		"@types/node": "^22",
+		"@types/pg": "^8.11.13",
+		"chalk": "^5.4.1",
+		"drizzle-kit": "^0.31.0"
+	},
+	"packageManager": "bun@1.2.10"
 }

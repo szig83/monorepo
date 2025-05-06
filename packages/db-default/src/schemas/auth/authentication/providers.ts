@@ -1,7 +1,7 @@
-import { serial, varchar, boolean, timestamp, jsonb } from 'drizzle-orm/pg-core'
-import { relations as drizzleRelations } from 'drizzle-orm'
-import { accounts } from './accounts'
-import { authSchema as schema } from '../schema'
+import { relations as drizzleRelations } from 'drizzle-orm';
+import { boolean, jsonb, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { authSchema as schema } from '../schema';
+import { accounts } from './accounts';
 
 const providers = schema.table('providers', {
 	id: serial('id').primaryKey(),
@@ -10,10 +10,10 @@ const providers = schema.table('providers', {
 	config: jsonb('config'),
 	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-})
+});
 
 const relations = drizzleRelations(providers, ({ many }) => ({
 	accounts: many(accounts),
-}))
+}));
 
-export { providers, relations }
+export { providers, relations };

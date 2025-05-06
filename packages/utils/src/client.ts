@@ -3,4 +3,4 @@
  * Kizárólag kliens oldalon használható segéd függvények
  */
 
-import 'client-only'
+import 'client-only';

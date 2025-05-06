@@ -1,11 +1,11 @@
-import { integer, timestamp, primaryKey } from 'drizzle-orm/pg-core'
-import { relations as drizzleRelations, InferSelectModel } from 'drizzle-orm'
-import { users } from '../users/users'
-import { groups } from './groups'
-import { authSchema as schema } from '../schema'
+import { type InferSelectModel, relations as drizzleRelations } from 'drizzle-orm';
+import { integer, primaryKey, timestamp } from 'drizzle-orm/pg-core';
+import { authSchema as schema } from '../schema';
+import { users } from '../users/users';
+import { groups } from './groups';
 
-import { createInsertSchema } from 'drizzle-valibot'
-import * as v from 'valibot'
+import { createInsertSchema } from 'drizzle-valibot';
+import type * as v from 'valibot';
 
 const userGroups = schema.table(
 	'user_groups',
@@ -15,7 +15,7 @@ const userGroups = schema.table(
 		createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 	},
 	(table) => [primaryKey({ columns: [table.userId, table.groupId] })],
-)
+);
 
 const relations = drizzleRelations(userGroups, ({ one }) => ({
 	user: one(users, {
@@ -26,10 +26,10 @@ const relations = drizzleRelations(userGroups, ({ one }) => ({
 		fields: [userGroups.groupId],
 		references: [groups.id],
 	}),
-}))
+}));
 
-const userGroupsSchema = createInsertSchema(userGroups)
+const userGroupsSchema = createInsertSchema(userGroups);
 
-export { userGroups, relations as userGroupsRelations, userGroupsSchema }
-export type UserGroupSchema = v.InferOutput<typeof userGroupsSchema>
-export type UserGroupSelectModel = InferSelectModel<typeof userGroups>
+export { userGroups, relations as userGroupsRelations, userGroupsSchema };
+export type UserGroupSchema = v.InferOutput<typeof userGroupsSchema>;
+export type UserGroupSelectModel = InferSelectModel<typeof userGroups>;

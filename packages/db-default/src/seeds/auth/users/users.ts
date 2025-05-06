@@ -1,19 +1,19 @@
-import { type DB } from '@/index'
+import type { DB } from '@/index';
+import { seedConfig } from '@/lib/seedConfig';
 //import { type UserSchema, users, userGroups, accounts } from '@/schemas'
-import * as schema from '@/schemas'
-import { type PgDatabase } from 'drizzle-orm/pg-core'
-import { type NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
-import { seedConfig } from '@/lib/seedConfig'
-import { hashPassword } from '@repo/utils/common'
-import { faker } from '@faker-js/faker'
+import * as schema from '@/schemas';
+import { faker } from '@faker-js/faker';
+import { hashPassword } from '@repo/utils/common';
+import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
+import type { PgDatabase } from 'drizzle-orm/pg-core';
 
-type mockUser = Omit<Extract<schema.UserSchema, { mode: 'signUp' }>, 'mode'>
+type mockUser = Omit<Extract<schema.UserSchema, { mode: 'signUp' }>, 'mode'>;
 type UserConfig = {
-	groupId: number
-	name: string
-	email: string
-	password: string
-}
+	groupId: number;
+	name: string;
+	email: string;
+	password: string;
+};
 
 /**
  * Véletlenszerű nevekkel, jelszavakkal és e-mail címekkel rendelkező publikus felhasználók listáját generálja.
@@ -22,18 +22,18 @@ type UserConfig = {
  * @returns {mockUser[]} Publikus felhasználói objektumok tömbje.
  */
 const mock = (count: number): mockUser[] => {
-	const data: mockUser[] = []
+	const data: mockUser[] = [];
 
 	for (let i = 0; i < count; i++) {
 		data.push({
 			name: faker.person.fullName(),
 			password: faker.internet.password({ memorable: true, length: 10 }),
 			email: faker.internet.email().toLowerCase(),
-		})
+		});
 	}
 
-	return data
-}
+	return data;
+};
 
 /**
  * Hozzárendeli a felhasználót egy csoporthoz.
@@ -50,8 +50,8 @@ const updateUserAndAssignGroup = async (
 	await db.insert(schema.userGroups).values({
 		userId,
 		groupId,
-	})
-}
+	});
+};
 
 /**
  * Létrehoz egy felhasználót és hozzárendeli a csoporthoz.
@@ -64,7 +64,7 @@ const addUser = async (
 	db: DB,
 	userConfig: UserConfig,
 ): Promise<{
-	user?: { id: number; email: string; name: string; password: string }
+	user?: { id: number; email: string; name: string; password: string };
 }> => {
 	return db.transaction(async (tx) => {
 		// User beszúrása
@@ -80,13 +80,13 @@ const addUser = async (
 				email: schema.users.email,
 				name: schema.users.name,
 				password: schema.users.name,
-			})
+			});
 
-		const insertedUser = userResult[0]
+		const insertedUser = userResult[0];
 		if (!insertedUser) {
 			// Ha a felhasználó beszúrása sikertelen, a tranzakció automatikusan visszagörgeti.
 			// Dobjunk egy hibát, hogy jelezzük a problémát.
-			throw new Error('Failed to insert user.')
+			throw new Error('Failed to insert user.');
 		}
 
 		// Accounts táblába beszúrás
@@ -99,23 +99,26 @@ const addUser = async (
 				password: hashPassword(userConfig.password),
 				isActive: true,
 			})
-			.returning({ id: schema.accounts.id, password: schema.accounts.password })
+			.returning({
+				id: schema.accounts.id,
+				password: schema.accounts.password,
+			});
 
-		const insertedAccount = accountResult[0]
+		const insertedAccount = accountResult[0];
 		if (!insertedAccount) {
 			// Ha az account beszúrása sikertelen, a tranzakció automatikusan visszagörgeti.
 			// Dobjunk egy hibát, hogy jelezzük a problémát.
-			throw new Error('Failed to insert account.')
+			throw new Error('Failed to insert account.');
 		}
-		insertedUser.password = userConfig.password
+		insertedUser.password = userConfig.password;
 
 		// Felhasználó hozzárendelése a csoporthoz
-		await updateUserAndAssignGroup(tx, insertedUser.id, userConfig.groupId)
+		await updateUserAndAssignGroup(tx, insertedUser.id, userConfig.groupId);
 
 		// Ha minden sikeres, a tranzakció commitálódik és visszaadjuk a felhasználó ID-ját.
-		return { user: insertedUser }
-	})
-}
+		return { user: insertedUser };
+	});
+};
 
 /**
  * Feltölti az adatbázist felhasználókkal.
@@ -129,21 +132,24 @@ const addUser = async (
  * @param db - Az adatbázis példány.
  * @param publicUserCount - A létrehozandó nyilvános felhasználók száma.
  */
-export async function seed(db: DB, publicUserCount: number = 0) {
-	const sysAdminUser = await addUser(db, seedConfig.users.sysadmin)
-	console.log('Rendszergazda felhasználó:', sysAdminUser.user)
+export async function seed(db: DB, publicUserCount = 0) {
+	const sysAdminUser = await addUser(db, seedConfig.users.sysadmin);
+	console.log('Rendszergazda felhasználó:', sysAdminUser.user);
 
 	if (sysAdminUser.user) {
-		const adminUser = await addUser(db, seedConfig.users.admin)
-		console.log('Admin felhasználó:', adminUser.user)
-		const contentEditorUser = await addUser(db, seedConfig.users.content_editor)
-		console.log('Tartalomszerkesztő felhasználó:', contentEditorUser.user)
+		const adminUser = await addUser(db, seedConfig.users.admin);
+		console.log('Admin felhasználó:', adminUser.user);
+		const contentEditorUser = await addUser(db, seedConfig.users.content_editor);
+		console.log('Tartalomszerkesztő felhasználó:', contentEditorUser.user);
 
 		if (publicUserCount > 0) {
-			const mockUsers = mock(publicUserCount)
+			const mockUsers = mock(publicUserCount);
 			for (const user of mockUsers) {
-				const publicUser = await addUser(db, { ...seedConfig.users.public_user, ...user })
-				console.log('Nyilvános felhasználó:', publicUser.user)
+				const publicUser = await addUser(db, {
+					...seedConfig.users.public_user,
+					...user,
+				});
+				console.log('Nyilvános felhasználó:', publicUser.user);
 			}
 		}
 	}

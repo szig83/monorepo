@@ -1,18 +1,17 @@
 {
-    "name": "@repo/utils",
-    "type": "module",
-    "private": true,
-    "exports": {
-        "./*": "./src/*.ts"
-    },
-    "scripts": {
-        "lint": "eslint . --max-warnings 0",
-        "check-types": "tsc --noEmit",
-        "update:dep:latest": "ncu --target latest -ui --format group --install always --packageManager bun",
-        "update:dep:newest": "ncu --target newest -ui --format group --install always --packageManager bun"
-    },
-    "devDependencies": {
-        "server-only": "^0.0.1",
-        "client-only": "^0.0.1"
-    }
+	"name": "@repo/utils",
+	"type": "module",
+	"private": true,
+	"exports": {
+		"./*": "./src/*.ts"
+	},
+	"scripts": {
+		"check-types": "tsc --noEmit",
+		"update:dep:latest": "ncu --target latest -ui --format group --install always --packageManager bun",
+		"update:dep:newest": "ncu --target newest -ui --format group --install always --packageManager bun"
+	},
+	"devDependencies": {
+		"server-only": "^0.0.1",
+		"client-only": "^0.0.1"
+	}
 }

@@ -1,26 +1,28 @@
-import { varchar, boolean, timestamp, serial } from 'drizzle-orm/pg-core'
-import { relations as drizzleRelations, InferSelectModel } from 'drizzle-orm'
-import { accounts } from '../authentication/accounts'
-import { sessions } from '../authentication/sessions'
-import { userGroups } from '../groups/user_groups'
-import { userRoles } from '../roles/user_roles'
-import { auditLogs } from '../audit/audit_logs'
-import { verifications } from '../authentication/verifications'
+import { type InferSelectModel, relations as drizzleRelations } from 'drizzle-orm';
+import { boolean, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { auditLogs } from '../audit/audit_logs';
+import { accounts } from '../authentication/accounts';
+import { sessions } from '../authentication/sessions';
+import { verifications } from '../authentication/verifications';
+import { userGroups } from '../groups/user_groups';
+import { userRoles } from '../roles/user_roles';
 
-import { authSchema as schema } from '../schema'
+import { authSchema as schema } from '../schema';
 
-import { createInsertSchema } from 'drizzle-valibot'
-import * as v from 'valibot'
+import { createInsertSchema } from 'drizzle-valibot';
+import * as v from 'valibot';
 
 const users = schema.table('users', {
 	id: serial('id').primaryKey() /*Unique identifier for each user*/,
-	name: varchar('full_name', { length: 100 }).notNull() /*Full name of the user*/,
+	name: varchar('full_name', {
+		length: 100,
+	}).notNull() /*Full name of the user*/,
 	email: varchar('email', { length: 255 }).notNull().unique() /*Email address of the user*/,
 	emailVerified:
-		boolean('email_verified').default(
-			false,
-		) /*Indicates if the user's email has been verified*/,
-	username: varchar('username', { length: 50 }).unique() /*Username of the user*/,
+		boolean('email_verified').default(false) /*Indicates if the user's email has been verified*/,
+	username: varchar('username', {
+		length: 50,
+	}).unique() /*Username of the user*/,
 	image: varchar('image', { length: 255 }) /*Profile image URL of the user*/,
 	createdAt: timestamp('created_at', {
 		withTimezone: true,
@@ -28,8 +30,10 @@ const users = schema.table('users', {
 	updatedAt: timestamp('updated_at', {
 		withTimezone: true,
 	}).defaultNow() /*Timestamp of last user update*/,
-	deletedAt: timestamp('deleted_at', { withTimezone: true }) /*Timestamp of user deletion*/,
-})
+	deletedAt: timestamp('deleted_at', {
+		withTimezone: true,
+	}) /*Timestamp of user deletion*/,
+});
 
 const relations = drizzleRelations(users, ({ many }) => ({
 	accounts: many(accounts),
@@ -38,7 +42,7 @@ const relations = drizzleRelations(users, ({ many }) => ({
 	userRoles: many(userRoles),
 	auditLogs: many(auditLogs),
 	verifications: many(verifications),
-}))
+}));
 
 const baseSchema = createInsertSchema(users, {
 	name: v.pipe(v.string(), v.minLength(1)),
@@ -46,7 +50,7 @@ const baseSchema = createInsertSchema(users, {
 	emailVerified: v.optional(v.boolean()),
 	username: v.optional(v.string()),
 	image: v.optional(v.string()),
-})
+});
 //.pick({ fullName: true, email: true, image: true })
 
 const userSchema = v.union([
@@ -67,8 +71,8 @@ const userSchema = v.union([
 		image: baseSchema.entries.image,
 		id: v.pipe(v.number(), v.minValue(1)),
 	}),
-])
+]);
 
-export { users, relations as usersRelations, userSchema }
-export type UserSchema = v.InferOutput<typeof userSchema>
-export type UserSelectModel = InferSelectModel<typeof users>
+export { users, relations as usersRelations, userSchema };
+export type UserSchema = v.InferOutput<typeof userSchema>;
+export type UserSelectModel = InferSelectModel<typeof users>;

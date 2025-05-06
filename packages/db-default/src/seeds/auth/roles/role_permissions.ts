@@ -1,6 +1,6 @@
-import { type DB } from '@/index'
-import { rolePermissions } from '@/schemas'
-import { rolePermissions as rolePermissionsSeedConfig } from '@/lib/seedConfig'
+import type { DB } from '@/index';
+import { rolePermissions as rolePermissionsSeedConfig } from '@/lib/seedConfig';
+import { rolePermissions } from '@/schemas';
 
 /**
  * Inicializálja a szerepkör-jogosultság kapcsolatokat a seedConfig-ban megadott adatokkal.
@@ -8,5 +8,5 @@ import { rolePermissions as rolePermissionsSeedConfig } from '@/lib/seedConfig'
  * @param db Az adatbázis példány.
  */
 export async function seed(db: DB) {
-	await db.insert(rolePermissions).values(rolePermissionsSeedConfig)
+	await db.insert(rolePermissions).values(rolePermissionsSeedConfig);
 }

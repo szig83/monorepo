@@ -2,4 +2,4 @@
  * @packageDocumentation
  * Kizárólag szerver oldalon használható segéd függvények
  */
-import 'server-only'
+import 'server-only';

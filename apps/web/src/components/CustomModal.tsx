@@ -1,18 +1,18 @@
-'use client'
+'use client';
 
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react'
-import { useRouter } from 'next/navigation'
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react';
+import { useRouter } from 'next/navigation';
 
 export default function CustomModal({
 	modalTitle,
 	modalFooter,
 	children,
 }: {
-	modalTitle?: string
-	modalFooter?: React.ReactNode
-	children: React.ReactNode
+	modalTitle?: string;
+	modalFooter?: React.ReactNode;
+	children: React.ReactNode;
 }) {
-	const router = useRouter()
+	const router = useRouter();
 	return (
 		<Modal defaultOpen={true} radius="sm" onClose={() => router.back()}>
 			<ModalContent className="bg-gray-100">
@@ -27,5 +27,5 @@ export default function CustomModal({
 				)}
 			</ModalContent>
 		</Modal>
-	)
+	);
 }

@@ -1,5 +1,5 @@
-import SignInForm from '@/components/auth/SignInForm'
+import SignInForm from '@/components/auth/SignInForm';
 
 export default async function SignInPageIntercept() {
-	return <SignInForm isInterceptingModal={true} />
+	return <SignInForm isInterceptingModal={true} />;
 }

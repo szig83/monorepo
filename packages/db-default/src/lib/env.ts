@@ -1,6 +1,6 @@
 // First load environment variables from various possible locations
 //import './loadEnv'
-import { z, ZodError } from 'zod'
+import { ZodError, z } from 'zod';
 
 const envSchema = z.object({
 	DB_HOST: z.string(),
@@ -15,10 +15,10 @@ const envSchema = z.object({
 		.transform((s) => s === 'true')
 		.optional(),
 	SEED_PUBLIC_USER_COUNT: z.coerce.number().optional().default(0),
-})
+});
 
 // Típus generálása a schemából
-type Env = z.infer<typeof envSchema>
+type Env = z.infer<typeof envSchema>;
 
 function validateEnv(): Env {
 	try {
@@ -31,13 +31,13 @@ function validateEnv(): Env {
 			SCHEMA_DIR: process.env.SCHEMA_DIR,
 			DB_MIGRATING: process.env.DB_MIGRATING,
 			SEED_PUBLIC_USER_COUNT: process.env.SEED_PUBLIC_USER_COUNT,
-		})
+		});
 	} catch (error) {
 		if (error instanceof ZodError) {
-			throw new Error(`Invalid environment variables:\n${z.prettifyError(error)}`)
+			throw new Error(`Invalid environment variables:\n${z.prettifyError(error)}`);
 		}
-		throw error
+		throw error;
 	}
 }
 
-export const env = validateEnv()
+export const env = validateEnv();

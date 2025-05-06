@@ -1,8 +1,8 @@
-import { serial, varchar, timestamp, integer, boolean, text } from 'drizzle-orm/pg-core'
-import { relations as drizzleRelations } from 'drizzle-orm'
-import { users } from '../users/users'
-import { providers } from './providers'
-import { authSchema as schema } from '../schema'
+import { relations as drizzleRelations } from 'drizzle-orm';
+import { boolean, integer, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { authSchema as schema } from '../schema';
+import { users } from '../users/users';
+import { providers } from './providers';
 
 const accounts = schema.table('accounts', {
 	id: serial('id').primaryKey() /*Unique identifier for each account*/,
@@ -23,13 +23,19 @@ const accounts = schema.table('accounts', {
 	refreshTokenExpiresAt: timestamp('refresh_token_expires_at', {
 		withTimezone: true,
 	}) /*The expiration time of the refresh token*/,
-	scope: varchar('scope', { length: 255 }) /*The scope of the account. Returned by the provider*/,
+	scope: varchar('scope', {
+		length: 255,
+	}) /*The scope of the account. Returned by the provider*/,
 	idToken: text('id_token') /*The id token returned from the provider*/,
 	isActive: boolean('is_active').default(true) /*Indicates if the account is active*/,
-	password: varchar('password', { length: 255 }) /*The password for the account*/,
+	password: varchar('password', {
+		length: 255,
+	}) /*The password for the account*/,
 	failedLoginAttempts:
 		integer('failed_login_attempts').default(0) /*The number of failed login attempts*/,
-	lastLoginAt: timestamp('last_login_at', { withTimezone: true }) /*The last login time*/,
+	lastLoginAt: timestamp('last_login_at', {
+		withTimezone: true,
+	}) /*The last login time*/,
 	passwordChangedAt: timestamp('password_changed_at', {
 		withTimezone: true,
 	}) /*The time the password was last changed*/,
@@ -39,7 +45,7 @@ const accounts = schema.table('accounts', {
 	updatedAt: timestamp('updated_at', {
 		withTimezone: true,
 	}).defaultNow() /*The time the account was last updated*/,
-})
+});
 
 const relations = drizzleRelations(accounts, ({ one }) => ({
 	user: one(users, {
@@ -50,6 +56,6 @@ const relations = drizzleRelations(accounts, ({ one }) => ({
 		fields: [accounts.providerId],
 		references: [providers.id],
 	}),
-}))
+}));
 
-export { accounts, relations }
+export { accounts, relations };

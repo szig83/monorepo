@@ -1,8 +1,8 @@
-import { serial, integer, timestamp, primaryKey } from 'drizzle-orm/pg-core'
-import { relations as drizzleRelations } from 'drizzle-orm'
-import { roles } from './roles'
-import { permissions } from '../permissions/permissions'
-import { authSchema as schema } from '../schema'
+import { relations as drizzleRelations } from 'drizzle-orm';
+import { integer, primaryKey, serial, timestamp } from 'drizzle-orm/pg-core';
+import { permissions } from '../permissions/permissions';
+import { authSchema as schema } from '../schema';
+import { roles } from './roles';
 
 const rolePermissions = schema.table(
 	'role_permissions',
@@ -12,7 +12,7 @@ const rolePermissions = schema.table(
 		createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 	},
 	(table) => [primaryKey({ columns: [table.roleId, table.permissionId] })],
-)
+);
 
 const relations = drizzleRelations(rolePermissions, ({ one }) => ({
 	role: one(roles, {
@@ -23,6 +23,6 @@ const relations = drizzleRelations(rolePermissions, ({ one }) => ({
 		fields: [rolePermissions.permissionId],
 		references: [permissions.id],
 	}),
-}))
+}));
 
-export { rolePermissions, relations }
+export { rolePermissions, relations };

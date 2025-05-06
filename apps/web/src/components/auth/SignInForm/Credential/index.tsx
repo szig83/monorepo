@@ -1,12 +1,12 @@
-'use client'
+'use client';
 
-import { Input } from '@heroui/react'
-import { useRef } from 'react'
+import { Input } from '@heroui/react';
+import { useRef } from 'react';
 
-import { authClient } from '@/lib/auth/client'
-import { useRouter } from 'next/navigation'
-import { Button } from '@heroui/button'
-import { useState } from 'react'
+import { authClient } from '@/lib/auth/client';
+import { Button } from '@heroui/button';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export const EyeSlashFilledIcon = (props: React.SVGProps<SVGSVGElement>) => {
 	return (
@@ -41,8 +41,8 @@ export const EyeSlashFilledIcon = (props: React.SVGProps<SVGSVGElement>) => {
 				fill="currentColor"
 			/>
 		</svg>
-	)
-}
+	);
+};
 
 export const EyeFilledIcon = (props: React.SVGProps<SVGSVGElement>) => {
 	return (
@@ -65,27 +65,31 @@ export const EyeFilledIcon = (props: React.SVGProps<SVGSVGElement>) => {
 				fill="currentColor"
 			/>
 		</svg>
-	)
-}
+	);
+};
 
 export default function SignInCredential({
 	isInterceptingModal = false,
 	signInButtonLabel = 'Belépés',
 	redirectTo = '/',
-}: Readonly<{ isInterceptingModal?: boolean; signInButtonLabel?: string; redirectTo?: string }>) {
-	const [signInError, setSignInError] = useState<string | null>(null)
-	const [isLoading, setIsLoading] = useState<boolean>(false)
-	const [email, setEmail] = useState('')
-	const [password, setPassword] = useState('')
-	const router = useRouter()
-	const emailRef = useRef<HTMLInputElement>(null)
+}: Readonly<{
+	isInterceptingModal?: boolean;
+	signInButtonLabel?: string;
+	redirectTo?: string;
+}>) {
+	const [signInError, setSignInError] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const router = useRouter();
+	const emailRef = useRef<HTMLInputElement>(null);
 
-	const [isVisible, setIsVisible] = useState(false)
+	const [isVisible, setIsVisible] = useState(false);
 
-	const toggleVisibility = () => setIsVisible(!isVisible)
+	const toggleVisibility = () => setIsVisible(!isVisible);
 
 	const handleSubmit = async () => {
-		setIsLoading(true)
+		setIsLoading(true);
 		await authClient.signIn.email(
 			{
 				email: email,
@@ -94,27 +98,27 @@ export default function SignInCredential({
 			{
 				onSuccess() {
 					if (isInterceptingModal) {
-						window.history.back()
+						window.history.back();
 						setTimeout(() => {
-							router.refresh()
-						}, 1)
+							router.refresh();
+						}, 1);
 					} else {
-						router.replace(redirectTo)
-						router.refresh()
+						router.replace(redirectTo);
+						router.refresh();
 					}
 				},
 				onError() {
-					setSignInError('Sikertelen bejelentkezés')
-					setEmail('')
-					setPassword('')
+					setSignInError('Sikertelen bejelentkezés');
+					setEmail('');
+					setPassword('');
 					setTimeout(() => {
-						emailRef.current?.focus()
-					}, 1)
+						emailRef.current?.focus();
+					}, 1);
 				},
 			},
-		)
-		setIsLoading(false)
-	}
+		);
+		setIsLoading(false);
+	};
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -168,5 +172,5 @@ export default function SignInCredential({
 				</Button>
 			</div>
 		</div>
-	)
+	);
 }

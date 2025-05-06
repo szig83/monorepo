@@ -43,7 +43,7 @@ export const groups = {
 			en: 'Users with basic access who can use the public features of the page after logging in',
 		},
 	},
-}
+};
 
 export const users = {
 	sysadmin: {
@@ -67,7 +67,7 @@ export const users = {
 	public_user: {
 		groupId: groups.public_user.id,
 	},
-}
+};
 
 export const resources = {
 	users: {
@@ -100,7 +100,7 @@ export const resources = {
 		name: 'settings',
 		description: 'Rendszerbeállítások kezelése',
 	},
-}
+};
 
 export const permissions = {
 	// Felhasználók kezelése
@@ -240,7 +240,7 @@ export const permissions = {
 		description: 'Beállítások módosítása',
 		resourceId: resources.settings.id,
 	},
-}
+};
 
 export const roles = {
 	sysadmin: {
@@ -263,7 +263,7 @@ export const roles = {
 		name: 'Felhasználó',
 		description: 'Alapszintű felhasználói szerep',
 	},
-}
+};
 
 export const rolePermissions = [
 	// Rendszergazda jogosultságok (minden jogosultság)
@@ -294,7 +294,7 @@ export const rolePermissions = [
 
 	// Felhasználó jogosultságok
 	{ roleId: roles.user.id, permissionId: permissions.content_view.id },
-]
+];
 
 export const groupPermissions = [
 	// Rendszergazda csoport jogosultságok (minden jogosultság)
@@ -317,14 +317,26 @@ export const groupPermissions = [
 	{ groupId: groups.admin.id, permissionId: permissions.settings_view.id },
 
 	// Tartalomszerkesztő csoport jogosultságok
-	{ groupId: groups.content_editor.id, permissionId: permissions.content_view.id },
-	{ groupId: groups.content_editor.id, permissionId: permissions.content_create.id },
-	{ groupId: groups.content_editor.id, permissionId: permissions.content_update.id },
-	{ groupId: groups.content_editor.id, permissionId: permissions.content_publish.id },
+	{
+		groupId: groups.content_editor.id,
+		permissionId: permissions.content_view.id,
+	},
+	{
+		groupId: groups.content_editor.id,
+		permissionId: permissions.content_create.id,
+	},
+	{
+		groupId: groups.content_editor.id,
+		permissionId: permissions.content_update.id,
+	},
+	{
+		groupId: groups.content_editor.id,
+		permissionId: permissions.content_publish.id,
+	},
 
 	// Általános felhasználói csoport jogosultságok
 	{ groupId: groups.public_user.id, permissionId: permissions.content_view.id },
-]
+];
 
 export const providers = {
 	local: {
@@ -363,7 +375,7 @@ export const providers = {
 			callbackUrl: 'http://localhost:3000/api/auth/callback/github',
 		},
 	},
-}
+};
 
 export const userRoles = [
 	// Rendszergazda felhasználó szerepkörei
@@ -379,7 +391,7 @@ export const userRoles = [
 	{ userId: 1, roleId: roles.user.id },
 	{ userId: 2, roleId: roles.user.id },
 	{ userId: 3, roleId: roles.user.id },
-]
+];
 
 export const seedConfig = {
 	users,
@@ -391,4 +403,4 @@ export const seedConfig = {
 	groupPermissions,
 	providers,
 	userRoles,
-}
+};

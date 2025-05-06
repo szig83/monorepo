@@ -1,17 +1,21 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import CustomModal from '@/components/CustomModal'
-import DividerWithText from '@/components/DividerWithText'
+import CustomModal from '@/components/CustomModal';
+import DividerWithText from '@/components/DividerWithText';
+import Link from 'next/link';
 
-import Credential from './Credential'
-import Social from './Social'
+import Credential from './Credential';
+import Social from './Social';
 
 export default function SignInForm({
 	isInterceptingModal,
 	isAdminPlace = false,
 	redirectTo = '/',
-}: Readonly<{ isInterceptingModal?: boolean; isAdminPlace?: boolean; redirectTo?: string }>) {
+}: Readonly<{
+	isInterceptingModal?: boolean;
+	isAdminPlace?: boolean;
+	redirectTo?: string;
+}>) {
 	return (
 		<CustomModal
 			modalTitle="Bejelentkezés"
@@ -32,5 +36,5 @@ export default function SignInForm({
 				</>
 			)}
 		</CustomModal>
-	)
+	);
 }

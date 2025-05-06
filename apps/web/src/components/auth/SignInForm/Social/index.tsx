@@ -1,5 +1,5 @@
-import SignInButton from './SignInButton'
-import { FaGoogle } from 'react-icons/fa'
+import { FaGoogle } from 'react-icons/fa';
+import SignInButton from './SignInButton';
 
 export default function index() {
 	return (
@@ -9,5 +9,5 @@ export default function index() {
 				Belépés Google fiókkal
 			</SignInButton>
 		</div>
-	)
+	);
 }

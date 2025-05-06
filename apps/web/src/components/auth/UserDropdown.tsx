@@ -1,9 +1,9 @@
-'use client'
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react'
-import LogoutButton from '@/components/auth/LogoutButton'
-import { FaAngleDown } from 'react-icons/fa6'
-import Image from 'next/image'
-import Link from 'next/link'
+'use client';
+import LogoutButton from '@/components/auth/LogoutButton';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@heroui/react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { FaAngleDown } from 'react-icons/fa6';
 
 export default function UserDropdown({
 	userFullName = '',
@@ -35,5 +35,5 @@ export default function UserDropdown({
 				</DropdownItem>
 			</DropdownMenu>
 		</Dropdown>
-	)
+	);
 }

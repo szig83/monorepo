@@ -1,11 +1,11 @@
-import { sql } from 'drizzle-orm'
-import db from '@/index'
-import * as path from 'path'
-import * as fs from 'fs'
-import { execSync } from 'child_process'
-import { config } from '@/lib/config'
-import * as cm from '@/lib/consoleMessage'
-import { format } from 'date-fns'
+import { execSync } from 'node:child_process';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import db from '@/index';
+import { config } from '@/lib/config';
+import * as cm from '@/lib/consoleMessage';
+import { format } from 'date-fns';
+import { sql } from 'drizzle-orm';
 
 /**
  * Törli a megadott sémákat az adatbázisból.
@@ -17,50 +17,50 @@ export async function deleteSchemas(
 	stopOnError = true,
 	alternateProcessText?: string,
 ): Promise<{ isSuccess: boolean; deletedSchemas: string[] }> {
-	const processText = alternateProcessText || 'Sémák törlése'
-	let isSuccess = true
-	const deletedSchemas: string[] = []
-	const silentDeleteSchemas = ['drizzle']
+	const processText = alternateProcessText || 'Sémák törlése';
+	let isSuccess = true;
+	const deletedSchemas: string[] = [];
+	const silentDeleteSchemas = ['drizzle'];
 
-	schemasToDelete.push('drizzle')
+	schemasToDelete.push('drizzle');
 	/*if (!schemasToDelete.includes('public')) {
 		schemasToDelete.push('public')
 	}*/
 
-	cm.startProcess(processText)
+	cm.startProcess(processText);
 
 	for (const schemaName of schemasToDelete) {
 		try {
-			await db.execute(sql.raw(`DROP SCHEMA IF EXISTS ${schemaName} CASCADE;`))
+			await db.execute(sql.raw(`DROP SCHEMA IF EXISTS ${schemaName} CASCADE;`));
 			if (!silentDeleteSchemas.includes(schemaName)) {
-				deletedSchemas.push(schemaName)
-				cm.subProcess('Sikeresen törölve', 'success', schemaName)
+				deletedSchemas.push(schemaName);
+				cm.subProcess('Sikeresen törölve', 'success', schemaName);
 			}
 		} catch (error) {
 			if (!silentDeleteSchemas.includes(schemaName)) {
-				isSuccess = false
-				cm.subProcess('Sikertelen törlés', 'error', schemaName)
+				isSuccess = false;
+				cm.subProcess('Sikertelen törlés', 'error', schemaName);
 				if (stopOnError) {
-					cm.consoleMessage(error, 'error')
-					cm.endProcess(processText, 'error')
-					process.exit(1)
+					cm.consoleMessage(error, 'error');
+					cm.endProcess(processText, 'error');
+					process.exit(1);
 				} else {
-					break
+					break;
 				}
 			}
 		}
 	}
 
 	if (isSuccess) {
-		cm.endProcess(processText, 'success')
+		cm.endProcess(processText, 'success');
 	} else {
-		cm.endProcess(processText, 'error')
+		cm.endProcess(processText, 'error');
 	}
 
 	return {
 		isSuccess,
 		deletedSchemas,
-	}
+	};
 }
 
 /**
@@ -68,25 +68,25 @@ export async function deleteSchemas(
  * @param stopOnError Ha igaz, akkor a hiba esetén leállítja a folyamatot.
  */
 export async function getLatestBackupFile(stopOnError = true): Promise<string> {
-	const processText = 'Legújabb backup fájl keresése'
-	let isSuccess = true
-	cm.startProcess(processText)
+	const processText = 'Legújabb backup fájl keresése';
+	let isSuccess = true;
+	cm.startProcess(processText);
 
-	const backupDir = path.join(__dirname, '..', config.BACKUP_DIR)
-	cm.subProcess('Backup könyvtár', 'info', backupDir)
-	let files: string[] = []
+	const backupDir = path.join(__dirname, '..', config.BACKUP_DIR);
+	cm.subProcess('Backup könyvtár', 'info', backupDir);
+	let files: string[] = [];
 
 	try {
-		files = fs.readdirSync(backupDir)
+		files = fs.readdirSync(backupDir);
 	} catch (error) {
-		isSuccess = false
-		cm.subProcess('Hiányzó backup könyvtár', 'error')
+		isSuccess = false;
+		cm.subProcess('Hiányzó backup könyvtár', 'error');
 		if (stopOnError) {
-			cm.consoleMessage(error, 'error')
-			cm.endProcess(processText, 'error')
-			process.exit(1)
+			cm.consoleMessage(error, 'error');
+			cm.endProcess(processText, 'error');
+			process.exit(1);
 		}
-		cm.endProcess(processText, 'error')
+		cm.endProcess(processText, 'error');
 	}
 
 	if (isSuccess) {
@@ -96,28 +96,28 @@ export async function getLatestBackupFile(stopOnError = true): Promise<string> {
 				name: file,
 				time: fs.statSync(path.join(backupDir, file)).mtime.getTime(),
 			}))
-			.sort((a, b) => b.time - a.time)
+			.sort((a, b) => b.time - a.time);
 
-		const latestBackup = sqlFiles[0]
+		const latestBackup = sqlFiles[0];
 
 		if (!latestBackup) {
-			cm.subProcess('Nem található SQL backup fájl a könyvtárban', 'error')
-			cm.endProcess(processText, 'error')
+			cm.subProcess('Nem található SQL backup fájl a könyvtárban', 'error');
+			cm.endProcess(processText, 'error');
 			if (stopOnError) {
-				process.exit(1)
+				process.exit(1);
 			}
 		} else {
-			const latestBackupFile = latestBackup.name
-			const filePath = path.join(backupDir, latestBackupFile)
-			cm.subProcess('Legújabb backup fájl:', 'success', latestBackupFile)
-			cm.endProcess(processText, 'success')
-			return filePath
+			const latestBackupFile = latestBackup.name;
+			const filePath = path.join(backupDir, latestBackupFile);
+			cm.subProcess('Legújabb backup fájl:', 'success', latestBackupFile);
+			cm.endProcess(processText, 'success');
+			return filePath;
 		}
 	} else {
-		cm.endProcess(processText, 'error')
+		cm.endProcess(processText, 'error');
 	}
 
-	return ''
+	return '';
 }
 
 /**
@@ -125,139 +125,134 @@ export async function getLatestBackupFile(stopOnError = true): Promise<string> {
  * @param stopOnError Ha igaz, akkor a hiba esetén leállítja a folyamatot.
  */
 export async function createSnapshot(stopOnError = true): Promise<string> {
-	const processText = 'Pillanatkép készítés'
-	let isSuccess = false
-	cm.startProcess(processText)
+	const processText = 'Pillanatkép készítés';
+	let isSuccess = false;
+	cm.startProcess(processText);
 
-	const snapshotDir = path.join(__dirname, '..', config.BACKUP_DIR, 'snapshots')
+	const snapshotDir = path.join(__dirname, '..', config.BACKUP_DIR, 'snapshots');
 	if (!fs.existsSync(snapshotDir)) {
-		fs.mkdirSync(snapshotDir, { recursive: true })
+		fs.mkdirSync(snapshotDir, { recursive: true });
 	}
 
-	cm.subProcess('Snapshot könyvtár', 'info', snapshotDir)
-	const filename = `${format(new Date(), 'yyyyMMdd_HHmmss')}.sql`
-	const snapshotFile = path.join(snapshotDir, filename)
+	cm.subProcess('Snapshot könyvtár', 'info', snapshotDir);
+	const filename = `${format(new Date(), 'yyyyMMdd_HHmmss')}.sql`;
+	const snapshotFile = path.join(snapshotDir, filename);
 	try {
 		execSync(
 			`docker exec ${config.DB_NAME}-db-container pg_dump -U ${config.DB_USER} --no-owner --no-privileges --inserts --encoding=UTF-8 --format=p ${config.DB_NAME} > ${snapshotFile}`,
-		)
+		);
 		if (fs.existsSync(snapshotFile)) {
-			isSuccess = true
-			cm.subProcess('A pillanatkép elkészült:', 'success', filename)
+			isSuccess = true;
+			cm.subProcess('A pillanatkép elkészült:', 'success', filename);
 		} else {
-			cm.subProcess('Hiba a pillanatkép készítése közben', 'error')
+			cm.subProcess('Hiba a pillanatkép készítése közben', 'error');
 		}
 	} catch (error) {
-		cm.subProcess('Hiba a pillanatkép készítése közben', 'error')
+		cm.subProcess('Hiba a pillanatkép készítése közben', 'error');
 		if (stopOnError) {
-			cm.consoleMessage(error, 'error')
-			cm.endProcess(processText, 'error')
-			process.exit(1)
+			cm.consoleMessage(error, 'error');
+			cm.endProcess(processText, 'error');
+			process.exit(1);
 		}
 	}
 
-	cm.endProcess(processText, isSuccess ? 'success' : 'error')
+	cm.endProcess(processText, isSuccess ? 'success' : 'error');
 
-	return isSuccess ? snapshotFile : ''
+	return isSuccess ? snapshotFile : '';
 }
 
 export async function getSchemasFromDB(
 	stopOnError = true,
 	alternateProcessText?: string,
 ): Promise<{ isSuccess: boolean; schemas: string[] }> {
-	const processText = alternateProcessText || 'Sémák lekérése adatbázisból'
-	let isSuccess = false
-	cm.startProcess(processText)
-	let schemas: string[] = []
+	const processText = alternateProcessText || 'Sémák lekérése adatbázisból';
+	let isSuccess = false;
+	cm.startProcess(processText);
+	let schemas: string[] = [];
 	try {
 		const result = await db.execute(
 			sql.raw(
 				`SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog', 'information_schema', 'pg_toast');`,
 			),
-		)
-		schemas = result.rows.map((row) => row.schema_name as string)
+		);
+		schemas = result.rows.map((row) => row.schema_name as string);
 		if (schemas.length > 0) {
-			cm.subProcess('Talált sémák:', 'success', schemas.join(', '))
+			cm.subProcess('Talált sémák:', 'success', schemas.join(', '));
 		} else {
-			cm.subProcess('Nem található több séma az adatbázisban', 'info')
+			cm.subProcess('Nem található több séma az adatbázisban', 'info');
 		}
-		isSuccess = true
+		isSuccess = true;
 	} catch (error) {
-		cm.subProcess('Hiba a séma lekérésekor', 'error')
-		const errorMessage = error instanceof Error ? error.message : String(error)
-		cm.consoleMessage(errorMessage, 'error', 1)
+		cm.subProcess('Hiba a séma lekérésekor', 'error');
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		cm.consoleMessage(errorMessage, 'error', 1);
 		if (stopOnError) {
-			cm.endProcess(processText, 'error')
-			process.exit(1)
+			cm.endProcess(processText, 'error');
+			process.exit(1);
 		}
 	}
-	cm.endProcess(processText, isSuccess ? 'success' : 'error')
+	cm.endProcess(processText, isSuccess ? 'success' : 'error');
 	return {
 		isSuccess,
 		schemas,
-	}
+	};
 }
 
 export function getSchemasFromOrm(stopOnError = true): string[] {
-	const processText = 'Sémák lekérése ORM definícióból'
-	let isSuccess = false
-	let schemas: string[] = []
+	const processText = 'Sémák lekérése ORM definícióból';
+	let isSuccess = false;
+	let schemas: string[] = [];
 
-	cm.startProcess(processText)
-	const schemasDir = path.resolve(__dirname, '..', config.SCHEMA_DIR)
-	cm.subProcess('Séma könyvtár', 'info', schemasDir)
+	cm.startProcess(processText);
+	const schemasDir = path.resolve(__dirname, '..', config.SCHEMA_DIR);
+	cm.subProcess('Séma könyvtár', 'info', schemasDir);
 
 	try {
-		const dirents = fs.readdirSync(schemasDir, { withFileTypes: true })
-		schemas = dirents.filter((dirent) => dirent.isDirectory()).map((dirent) => dirent.name)
+		const dirents = fs.readdirSync(schemasDir, { withFileTypes: true });
+		schemas = dirents.filter((dirent) => dirent.isDirectory()).map((dirent) => dirent.name);
 
 		if (schemas.length > 0) {
-			const expectedSchemas = [...config.SCHEMAS].sort()
-			const foundSchemasSorted = [...schemas].sort()
+			const expectedSchemas = [...config.SCHEMAS].sort();
+			const foundSchemasSorted = [...schemas].sort();
 
-			cm.subProcess('Szükséges sémák:', 'info', expectedSchemas.join(', '))
-			cm.subProcess('Talált sémák:', 'success', foundSchemasSorted.join(', '))
+			cm.subProcess('Szükséges sémák:', 'info', expectedSchemas.join(', '));
+			cm.subProcess('Talált sémák:', 'success', foundSchemasSorted.join(', '));
 
-			const missingSchemas = expectedSchemas.filter((s) => !foundSchemasSorted.includes(s))
-			const unexpectedSchemas = foundSchemasSorted.filter((s) => !expectedSchemas.includes(s))
+			const missingSchemas = expectedSchemas.filter((s) => !foundSchemasSorted.includes(s));
+			const unexpectedSchemas = foundSchemasSorted.filter((s) => !expectedSchemas.includes(s));
 
 			if (missingSchemas.length > 0 || unexpectedSchemas.length > 0) {
-				isSuccess = false
+				isSuccess = false;
 				if (missingSchemas.length > 0) {
-					cm.subProcess('Hiányzó séma:', 'error', missingSchemas.join(', '))
+					cm.subProcess('Hiányzó séma:', 'error', missingSchemas.join(', '));
 				}
 				if (unexpectedSchemas.length > 0) {
-					cm.subProcess('Nem várt séma:', 'error', unexpectedSchemas.join(', '))
+					cm.subProcess('Nem várt séma:', 'error', unexpectedSchemas.join(', '));
 				}
 			} else {
-				isSuccess = true // Mark as success
+				isSuccess = true; // Mark as success
 			}
 		} else {
-			cm.subProcess('Nem található séma a könyvtárban', 'error')
+			cm.subProcess('Nem található séma a könyvtárban', 'error');
 		}
 	} catch (error: unknown) {
-		if (
-			typeof error === 'object' &&
-			error !== null &&
-			'code' in error &&
-			error.code === 'ENOENT'
-		) {
-			cm.subProcess('A séma könyvtár nem található', 'error')
+		if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'ENOENT') {
+			cm.subProcess('A séma könyvtár nem található', 'error');
 		} else {
-			cm.subProcess('Hiba a séma könyvtár olvasása közben', 'error')
+			cm.subProcess('Hiba a séma könyvtár olvasása közben', 'error');
 		}
 	}
 
 	if (isSuccess) {
-		cm.endProcess(processText, 'success')
+		cm.endProcess(processText, 'success');
 	} else {
-		cm.endProcess(processText, 'error')
+		cm.endProcess(processText, 'error');
 		if (stopOnError) {
-			process.exit(1)
+			process.exit(1);
 		}
 	}
 
-	return isSuccess ? schemas : []
+	return isSuccess ? schemas : [];
 }
 
 export async function restore(
@@ -265,82 +260,77 @@ export async function restore(
 	stopOnError = true,
 	isSnapshot = false,
 ): Promise<boolean> {
-	let isSuccess = false
-	const processText = isSnapshot ? 'Adatbázis visszaállítás' : 'Adatbázis betöltés'
-	cm.startProcess(processText)
-	cm.subProcess('SQL fájl:', 'info', sqlFile)
+	let isSuccess = false;
+	const processText = isSnapshot ? 'Adatbázis visszaállítás' : 'Adatbázis betöltés';
+	cm.startProcess(processText);
+	cm.subProcess('SQL fájl:', 'info', sqlFile);
 	try {
-		const backupSQL = fs.readFileSync(sqlFile, 'utf8')
+		const backupSQL = fs.readFileSync(sqlFile, 'utf8');
 		if (backupSQL) {
-			cm.subProcess('SQL fájl tartalmának beolvasása', 'success')
+			cm.subProcess('SQL fájl tartalmának beolvasása', 'success');
 		}
-		await db.execute(sql.raw(backupSQL))
-		isSuccess = true
+		await db.execute(sql.raw(backupSQL));
+		isSuccess = true;
 	} catch (error) {
-		if (
-			typeof error === 'object' &&
-			error !== null &&
-			'code' in error &&
-			error.code === 'ENOENT'
-		) {
-			cm.subProcess('Hiba az SQL fájl olvasása közben', 'error')
+		if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'ENOENT') {
+			cm.subProcess('Hiba az SQL fájl olvasása közben', 'error');
 		} else {
-			cm.subProcess('Hiba az SQL fájl futtatása közben', 'error')
+			cm.subProcess('Hiba az SQL fájl futtatása közben', 'error');
 		}
 
-		const errorMessage = error instanceof Error ? error.message : String(error)
+		const errorMessage = error instanceof Error ? error.message : String(error);
 
-		cm.consoleMessage(errorMessage, 'error', 1)
+		cm.consoleMessage(errorMessage, 'error', 1);
 		if (stopOnError) {
-			cm.endProcess(processText, 'error')
-			process.exit(1)
+			cm.endProcess(processText, 'error');
+			process.exit(1);
 		}
 	}
 
 	if (isSuccess) {
-		cm.endProcess(processText, 'success')
+		cm.endProcess(processText, 'success');
 	} else {
-		cm.endProcess(processText, 'error')
+		cm.endProcess(processText, 'error');
 	}
-	return isSuccess
+	return isSuccess;
 }
 
 export async function dropDatabase(stopOnError = true): Promise<boolean> {
-	const processText = 'Adatbázis törlése'
-	let isSuccess = false
-	cm.startProcess(processText)
+	const processText = 'Adatbázis törlése';
+	let isSuccess = false;
+	cm.startProcess(processText);
 	try {
-		await db.execute(sql.raw(`DROP DATABASE IF EXISTS ${config.DB_NAME};`))
-		cm.subProcess('Adatbázis törlése', 'success')
-		isSuccess = true
+		await db.execute(sql.raw(`DROP DATABASE IF EXISTS ${config.DB_NAME};`));
+		cm.subProcess('Adatbázis törlése', 'success');
+		isSuccess = true;
 	} catch (error) {
-		cm.subProcess('Hiba az adatbázis törlésekor', 'error')
-		const errorMessage = error instanceof Error ? error.message : String(error)
-		cm.consoleMessage(errorMessage, 'error', 1)
+		cm.subProcess('Hiba az adatbázis törlésekor', 'error');
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		cm.consoleMessage(errorMessage, 'error', 1);
 		if (stopOnError) {
-			cm.endProcess(processText, 'error')
-			process.exit(1)
+			cm.endProcess(processText, 'error');
+			process.exit(1);
 		}
 	}
-	return isSuccess
+	return isSuccess;
 }
 
 export async function createDatabase(stopOnError = true): Promise<boolean> {
-	const processText = 'Adatbázis létrehozása'
-	let isSuccess = false
-	cm.startProcess(processText)
+	const processText = 'Adatbázis létrehozása';
+	let isSuccess = false;
+	cm.startProcess(processText);
 	try {
-		await db.execute(sql.raw(`CREATE DATABASE IF NOT EXISTS ${config.DB_NAME};`))
-		cm.subProcess('Adatbázis létrehozva:', 'success', config.DB_NAME)
-		isSuccess = true
+		await db.execute(sql.raw(`CREATE DATABASE IF NOT EXISTS ${config.DB_NAME};`));
+		cm.subProcess('Adatbázis létrehozva:', 'success', config.DB_NAME);
+		isSuccess = true;
 	} catch (error) {
-		cm.subProcess('Hiba az adatbázis létrehozásakor', 'error')
-		const errorMessage = error instanceof Error ? error.message : String(error)
-		cm.consoleMessage(errorMessage, 'error', 1)
+		cm.subProcess('Hiba az adatbázis létrehozásakor', 'error');
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		cm.consoleMessage(errorMessage, 'error', 1);
 		if (stopOnError) {
-			cm.endProcess(processText, 'error')
-			process.exit(1)
+			cm.endProcess(processText, 'error');
+			process.exit(1);
 		}
 	}
-	return isSuccess
+	return isSuccess;
 }

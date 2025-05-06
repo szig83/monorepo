@@ -1,5 +1,5 @@
-import LoginForm from '@/components/auth/SignInForm'
-import { ADMIN_ROUTES } from '@/lib/routes'
+import LoginForm from '@/components/auth/SignInForm';
+import { ADMIN_ROUTES } from '@/lib/routes';
 
 export default function AdminSignInPage() {
 	return (
@@ -11,5 +11,5 @@ export default function AdminSignInPage() {
 				</div>
 			</div>
 		</>
-	)
+	);
 }

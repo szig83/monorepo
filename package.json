@@ -1,32 +1,27 @@
 {
-    "name": "monorepo",
-    "private": true,
-    "scripts": {
-        "build": "turbo run build",
-        "dev": "turbo run dev",
-        "lint": "turbo run lint",
-        "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-        "check-types": "turbo run check-types",
-        "update:dep:latest": "ncu --target latest -ui --format group --install always --packageManager bun",
-        "update:dep:newest": "ncu --target newest -ui --format group --install always --packageManager bun",
-        "docker:start": "dotenv -e envs/.env.database.local -- docker-compose -f docker/docker-compose.yml up -d",
-        "docker:stop": "dotenv -e envs/.env.database.local -- docker-compose -f docker/docker-compose.yml down -v"
-    },
-    "devDependencies": {
-        "dotenv-cli": "^8.0.0",
-        "npm-check-updates": "^18.0.1",
-        "prettier": "^3.5.3",
-        "prettier-plugin-css-order": "^2.1.2",
-        "prettier-plugin-tailwindcss": "^0.6.11",
-        "turbo": "^2.5.1",
-        "typescript": "5.8.3"
-    },
-    "engines": {
-        "node": ">=18"
-    },
-    "packageManager": "bun@1.2.10",
-    "workspaces": [
-        "apps/*",
-        "packages/*"
-    ]
+	"name": "monorepo",
+	"private": true,
+	"scripts": {
+		"build": "turbo run build",
+		"dev": "turbo run dev",
+		"lint": "turbo run lint",
+		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
+		"check-types": "turbo run check-types",
+		"update:dep:latest": "ncu --target latest -ui --format group --install always --packageManager bun",
+		"update:dep:newest": "ncu --target newest -ui --format group --install always --packageManager bun",
+		"docker:start": "dotenv -e envs/.env.database.local -- docker-compose -f docker/docker-compose.yml up -d",
+		"docker:stop": "dotenv -e envs/.env.database.local -- docker-compose -f docker/docker-compose.yml down -v"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"dotenv-cli": "^8.0.0",
+		"npm-check-updates": "^18.0.1",
+		"turbo": "^2.5.1",
+		"typescript": "5.8.3"
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"packageManager": "bun@1.2.10",
+	"workspaces": ["apps/*", "packages/*"]
 }

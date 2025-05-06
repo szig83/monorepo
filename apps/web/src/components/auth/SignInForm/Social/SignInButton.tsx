@@ -1,21 +1,21 @@
-import { type SocialProvider } from '@/lib/auth'
-import { capitalizeFirstLetter } from '@repo/utils/common'
-import { Button } from '@heroui/react'
-import { authClient } from '@/lib/auth/client'
+import type { SocialProvider } from '@/lib/auth';
+import { authClient } from '@/lib/auth/client';
+import { Button } from '@heroui/react';
+import { capitalizeFirstLetter } from '@repo/utils/common';
 
 export default function SignInSocialButton({
 	children,
 	provider,
 }: Readonly<{
-	children?: React.ReactNode
-	provider: SocialProvider
+	children?: React.ReactNode;
+	provider: SocialProvider;
 }>) {
 	async function handleSignIn(provider: SocialProvider) {
-		console.log('handleSignIn', provider)
+		console.log('handleSignIn', provider);
 		await authClient.signIn.social({
 			provider: provider,
 			callbackURL: '/user-profile',
-		})
+		});
 	}
 
 	return (
@@ -28,5 +28,5 @@ export default function SignInSocialButton({
 		>
 			{children ?? `Belépés ${capitalizeFirstLetter(provider)} fiókkal`}
 		</Button>
-	)
+	);
 }

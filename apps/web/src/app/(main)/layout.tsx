@@ -1,13 +1,13 @@
-import Link from 'next/link'
-import { Providers } from './providers'
-import UserAuthControl from '@/components/auth/UserAuthControl'
+import UserAuthControl from '@/components/auth/UserAuthControl';
+import Link from 'next/link';
+import { Providers } from './providers';
 
 export default async function MainLayout({
 	modal,
 	children,
 }: {
-	modal: React.ReactNode
-	children: React.ReactNode
+	modal: React.ReactNode;
+	children: React.ReactNode;
 }) {
 	return (
 		<Providers>
@@ -23,5 +23,5 @@ export default async function MainLayout({
 				{modal}
 			</div>
 		</Providers>
-	)
+	);
 }

@@ -5,11 +5,11 @@
 
 // A procedúra által visszaadott csoport típusa
 export interface Group {
-	id: number
-	name: Record<string, string> // JSONB a többnyelvű névnek
-	description: Record<string, string> // JSONB a többnyelvű leírásnak
-	created_at: Date
-	updated_at: Date
+	id: number;
+	name: Record<string, string>; // JSONB a többnyelvű névnek
+	description: Record<string, string>; // JSONB a többnyelvű leírásnak
+	created_at: Date;
+	updated_at: Date;
 }
 
 /**
@@ -17,4 +17,4 @@ export interface Group {
  * @param id - Opcionális csoport azonosító
  * @returns - A csoportadatok listája
  */
-export declare function getGroups(id?: number): Promise<Group[]>
+export declare function getGroups(id?: number): Promise<Group[]>;

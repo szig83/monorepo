@@ -1,12 +1,12 @@
-import { betterAuth } from 'better-auth'
-import db from '@repo/db-default/db'
-import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { config } from '@/lib/config';
+import db from '@repo/db-default/db';
 //import { createAuthMiddleware } from 'better-auth/api'
-import * as schema from '@repo/db-default/schemas'
-import { nextCookies } from 'better-auth/next-js'
-import { config } from '@/lib/config'
-import { eq } from 'drizzle-orm'
-import { customSession } from 'better-auth/plugins'
+import * as schema from '@repo/db-default/schemas';
+import { betterAuth } from 'better-auth';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { nextCookies } from 'better-auth/next-js';
+import { customSession } from 'better-auth/plugins';
+import { eq } from 'drizzle-orm';
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: 'pg',
@@ -44,7 +44,9 @@ export const auth = betterAuth({
 					/** Mielott letrejon az uj session, toroljuk a felhasznalo meglevo sessionjeit.
 					 * Ez megakadalyozza, hogy parhuzamosan be legyen jelentkezve.
 					 */
-					await db.delete(schema.sessions).where(eq(schema.sessions.userId, Number(session.userId)))
+					await db
+						.delete(schema.sessions)
+						.where(eq(schema.sessions.userId, Number(session.userId)));
 				},
 			},
 		},
@@ -63,12 +65,12 @@ export const auth = betterAuth({
 			const roles = {
 				admin: false,
 				user: false,
-			}
+			};
 			const x = await db
 				.select()
 				.from(schema.users)
-				.where(eq(schema.users.id, Number(user.id)))
-			console.log('x', x)
+				.where(eq(schema.users.id, Number(user.id)));
+			console.log('x', x);
 			return {
 				roles,
 				user: {
@@ -76,12 +78,12 @@ export const auth = betterAuth({
 					newField: 'newField',
 				},
 				session,
-			}
+			};
 		}),
 	],
-})
+});
 
-export type Auth = typeof auth
+export type Auth = typeof auth;
 export type SocialProvider =
 	| 'github'
 	| 'apple'
@@ -95,4 +97,4 @@ export type SocialProvider =
 	| 'dropbox'
 	| 'linkedin'
 	| 'gitlab'
-	| 'reddit'
+	| 'reddit';

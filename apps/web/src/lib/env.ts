@@ -1,4 +1,4 @@
-import { z, ZodError } from 'zod'
+import { ZodError, z } from 'zod';
 
 const envSchema = z.object({
 	NODE_ENV: z.enum(['development', 'production']),
@@ -6,10 +6,10 @@ const envSchema = z.object({
 	GOOGLE_CLIENT_SECRET: z.string().optional(),
 	BETTER_AUTH_SECRET: z.string().optional(),
 	BETTER_AUTH_URL: z.string().optional(),
-})
+});
 
 // Típus generálása a schemából
-type Env = z.infer<typeof envSchema>
+type Env = z.infer<typeof envSchema>;
 
 function validateEnv(): Env {
 	try {
@@ -19,14 +19,14 @@ function validateEnv(): Env {
 			GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 			BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
 			BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
-		})
+		});
 	} catch (error) {
 		if (error instanceof ZodError) {
-			throw new Error(`Invalid environment variables:\n${z.prettifyError(error)}`)
+			throw new Error(`Invalid environment variables:\n${z.prettifyError(error)}`);
 		}
-		throw error
+		throw error;
 	}
 }
 
 // Használat
-export const env = validateEnv()
+export const env = validateEnv();

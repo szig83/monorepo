@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function LoginButton() {
-	const pathname = usePathname()
-	const isSignInPage = pathname === '/sign-in'
+	const pathname = usePathname();
+	const isSignInPage = pathname === '/sign-in';
 
 	return (
 		<>
@@ -15,5 +15,5 @@ export default function LoginButton() {
 				</Link>
 			)}
 		</>
-	)
+	);
 }

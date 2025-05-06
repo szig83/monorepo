@@ -1,8 +1,8 @@
-import { serial, integer, timestamp, primaryKey } from 'drizzle-orm/pg-core'
-import { relations as drizzleRelations } from 'drizzle-orm'
-import { groups } from './groups'
-import { permissions } from '../permissions/permissions'
-import { authSchema as schema } from '../schema'
+import { relations as drizzleRelations } from 'drizzle-orm';
+import { integer, primaryKey, serial, timestamp } from 'drizzle-orm/pg-core';
+import { permissions } from '../permissions/permissions';
+import { authSchema as schema } from '../schema';
+import { groups } from './groups';
 
 const groupPermissions = schema.table(
 	'group_permissions',
@@ -12,7 +12,7 @@ const groupPermissions = schema.table(
 		createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 	},
 	(table) => [primaryKey({ columns: [table.groupId, table.permissionId] })],
-)
+);
 
 const relations = drizzleRelations(groupPermissions, ({ one }) => ({
 	group: one(groups, {
@@ -23,6 +23,6 @@ const relations = drizzleRelations(groupPermissions, ({ one }) => ({
 		fields: [groupPermissions.permissionId],
 		references: [permissions.id],
 	}),
-}))
+}));
 
-export { groupPermissions, relations }
+export { groupPermissions, relations };
