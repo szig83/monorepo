@@ -1,5 +1,10 @@
 import * as v from 'valibot';
-import { type GroupSchema, groupSchema, groups } from './schemas/auth/groups/groups';
+import { type GroupInsertSchema, groupInsertSchema } from './schemas/auth/groups/groups';
 
-const parsed: GroupSchema = v.parse(groupSchema, { name: { hu: 'test' } });
-console.log(parsed);
+const data: GroupInsertSchema = {
+	name: { hu: 'test', en: 'a' },
+	description: { hu: 'test', en: 'a' },
+};
+
+const parsed = v.safeParse(groupInsertSchema, data);
+console.log(parsed.issues);

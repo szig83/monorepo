@@ -34,6 +34,20 @@ export const localizedTextSchema = v.objectWithRest(
 // Type helper (optional but good practice)
 export type LocalizedText = v.InferOutput<typeof localizedTextSchema>;
 
+// Új séma a rugalmas lokalizált szöveghez (üres stringeket és opcionális egyéb nyelveket is megenged)
+export const flexibleLocalizedTextSchema = v.objectWithRest(
+	{
+		hu: v.string("A 'hu' fordításnak stringnek kell lennie."),
+		en: v.string("Az 'en' fordításnak stringnek kell lennie."),
+	},
+	v.optional(
+		v.string(
+			'A további fordításoknak stringnek kell lenniük, ha meg vannak adva, vagy undefined értékűek lehetnek.',
+		),
+	),
+);
+export type FlexibleLocalizedText = v.InferOutput<typeof flexibleLocalizedTextSchema>;
+
 /**
  * Hash a password using scrypt algorithm to match Better Auth's hashing implementation
  * @param {string} password - The plaintext password to hash

@@ -21,18 +21,18 @@
 	"dependencies": {
 		"cross-env": "^7.0.3",
 		"date-fns": "^4.1.0",
-		"drizzle-orm": "^0.42.0",
+		"drizzle-orm": "^0.43.1",
 		"drizzle-valibot": "^0.4.1",
-		"pg": "^8.14.1",
-		"valibot": "^1.0.0"
+		"pg": "^8.15.6",
+		"valibot": "^1.1.0"
 	},
 	"devDependencies": {
 		"@faker-js/faker": "^9.7.0",
 		"@repo/utils": "*",
 		"@types/node": "^22",
-		"@types/pg": "^8.11.13",
+		"@types/pg": "^8.12.0",
 		"chalk": "^5.4.1",
-		"drizzle-kit": "^0.31.0"
+		"drizzle-kit": "^0.31.1"
 	},
-	"packageManager": "bun@1.2.10"
+	"packageManager": "bun@1.2.12"
 }
